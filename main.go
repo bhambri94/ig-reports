@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -53,6 +54,7 @@ func handleSaveIGReportToSheets(ctx *fasthttp.RequestCtx) {
 		sugar.Infof("calling ig reprts failure due to api no response!")
 		return
 	} else {
+		fmt.Println(string(resp))
 		actual := strings.Index(string(resp), "<script type=\"text/javascript\">window._sharedData")
 		end := strings.Index(string(resp), "<script type=\"text/javascript\">window.__initialDataLoaded(window._sharedData);</script>")
 		if actual < 1000 && end < 1000 {
