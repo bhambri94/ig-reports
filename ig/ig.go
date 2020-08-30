@@ -35,87 +35,86 @@ func GetReport(userName string) [][]interface{} {
 	var row []interface{}
 	TotalLikes := 0.0
 	TotalComments := 0.0
-	if len(igResponse.EntryData.ProfilePage) < 0 {
-		return nil
-	}
-	userId := igResponse.EntryData.ProfilePage[0].Graphql.User.ID
-	EndCursor := igResponse.EntryData.ProfilePage[0].Graphql.User.EdgeOwnerToTimelineMedia.PageInfo.EndCursor
-	row = append(row, Time)
-	row = append(row, igResponse.EntryData.ProfilePage[0].Graphql.User.Username)
-	Followers := igResponse.EntryData.ProfilePage[0].Graphql.User.EdgeFollowedBy.Count
-	row = append(row, Followers)
-	row = append(row, "NA")
-	row = append(row, igResponse.EntryData.ProfilePage[0].Graphql.User.EdgeOwnerToTimelineMedia.Count)
+	if len(igResponse.EntryData.ProfilePage) > 0 {
+		userId := igResponse.EntryData.ProfilePage[0].Graphql.User.ID
+		EndCursor := igResponse.EntryData.ProfilePage[0].Graphql.User.EdgeOwnerToTimelineMedia.PageInfo.EndCursor
+		row = append(row, Time)
+		row = append(row, igResponse.EntryData.ProfilePage[0].Graphql.User.Username)
+		Followers := igResponse.EntryData.ProfilePage[0].Graphql.User.EdgeFollowedBy.Count
+		row = append(row, Followers)
+		row = append(row, "NA")
+		row = append(row, igResponse.EntryData.ProfilePage[0].Graphql.User.EdgeOwnerToTimelineMedia.Count)
 
-	i := 0
-	Engagement := make([]int, 12)
-	for i < 12 && i < len(igResponse.EntryData.ProfilePage[0].Graphql.User.EdgeOwnerToTimelineMedia.Edges) {
-		Likes := igResponse.EntryData.ProfilePage[0].Graphql.User.EdgeOwnerToTimelineMedia.Edges[i].Node.EdgeLikedBy.Count
-		Comments := igResponse.EntryData.ProfilePage[0].Graphql.User.EdgeOwnerToTimelineMedia.Edges[i].Node.EdgeMediaToComment.Count
-		TotalLikes = TotalLikes + float64(Likes)
-		TotalComments = TotalComments + float64(Comments)
-		Engagement[i] = (Likes + Comments)
-		MediaTimestamp := igResponse.EntryData.ProfilePage[0].Graphql.User.EdgeOwnerToTimelineMedia.Edges[i].Node.TakenAtTimestamp
-		if t-MediaTimestamp < (30 * 24 * 60 * 60) {
-			NumberOfPosts30Days++
-		}
-		i++
-	}
-	sort.Sort(sort.IntSlice(Engagement))
-	i = 3
-	total := 0
-	for i < 12 {
-		total = total + Engagement[i]
-		i++
-	}
-	avgEngagement := float64(total) / (9 * float64(Followers))
-	BestEngagement := (float64(TotalLikes) + float64(TotalComments)) / (12 * float64(Followers))
-
-	MediaTimestamp := t - 1
-	Days := 180
-	i = 0
-	if EndCursor != "" {
-		for t-MediaTimestamp < (Days * 24 * 60 * 60) {
-			URL := "https://www.instagram.com/graphql/query/?query_hash=bfa387b2992c3a52dcbe447467b4b771&variables=%7B%22id%22%3A%22" + userId + "%22%2C%22first%22%3A12%2C%22after%22%3A%22" + EndCursor[:len(EndCursor)-2] + "%3D%3D%22%7D"
-			fmt.Println(URL)
-			resp, err := soup.Get(URL)
-			if err != nil {
-				fmt.Println("username not found")
+		i := 0
+		Engagement := make([]int, 12)
+		for i < 12 && i < len(igResponse.EntryData.ProfilePage[0].Graphql.User.EdgeOwnerToTimelineMedia.Edges) {
+			Likes := igResponse.EntryData.ProfilePage[0].Graphql.User.EdgeOwnerToTimelineMedia.Edges[i].Node.EdgeLikedBy.Count
+			Comments := igResponse.EntryData.ProfilePage[0].Graphql.User.EdgeOwnerToTimelineMedia.Edges[i].Node.EdgeMediaToComment.Count
+			TotalLikes = TotalLikes + float64(Likes)
+			TotalComments = TotalComments + float64(Comments)
+			Engagement[i] = (Likes + Comments)
+			MediaTimestamp := igResponse.EntryData.ProfilePage[0].Graphql.User.EdgeOwnerToTimelineMedia.Edges[i].Node.TakenAtTimestamp
+			if t-MediaTimestamp < (30 * 24 * 60 * 60) {
+				NumberOfPosts30Days++
 			}
-			var mediaResponse MediaResponse
-			json.Unmarshal([]byte(resp), &mediaResponse)
-			EndCursor = mediaResponse.Data.User.EdgeOwnerToTimelineMedia.PageInfo.EndCursor
-			j := 0
-			if len(mediaResponse.Data.User.EdgeOwnerToTimelineMedia.Edges) <= 0 {
-				break
-			}
-			for j < len(mediaResponse.Data.User.EdgeOwnerToTimelineMedia.Edges) {
-				MediaTimestamp = mediaResponse.Data.User.EdgeOwnerToTimelineMedia.Edges[j].Node.TakenAtTimestamp
-				if t-MediaTimestamp < (30 * 24 * 60 * 60) {
-					NumberOfPosts30Days++
-				}
-				if t-MediaTimestamp < (90 * 24 * 60 * 60) {
-					NumberOfPosts90Days++
-				}
-				if t-MediaTimestamp < (180 * 24 * 60 * 60) {
-					NumberOfPosts180Days++
-				}
-				j++
-			}
-			time.Sleep(1 * time.Second)
 			i++
 		}
+		sort.Sort(sort.IntSlice(Engagement))
+		i = 3
+		total := 0
+		for i < 12 {
+			total = total + Engagement[i]
+			i++
+		}
+		avgEngagement := float64(total) / (9 * float64(Followers))
+		BestEngagement := (float64(TotalLikes) + float64(TotalComments)) / (12 * float64(Followers))
+
+		MediaTimestamp := t - 1
+		Days := 180
+		i = 0
+		if EndCursor != "" {
+			for t-MediaTimestamp < (Days * 24 * 60 * 60) {
+				URL := "https://www.instagram.com/graphql/query/?query_hash=bfa387b2992c3a52dcbe447467b4b771&variables=%7B%22id%22%3A%22" + userId + "%22%2C%22first%22%3A12%2C%22after%22%3A%22" + EndCursor[:len(EndCursor)-2] + "%3D%3D%22%7D"
+				fmt.Println(URL)
+				resp, err := soup.Get(URL)
+				if err != nil {
+					fmt.Println("username not found")
+				}
+				var mediaResponse MediaResponse
+				json.Unmarshal([]byte(resp), &mediaResponse)
+				EndCursor = mediaResponse.Data.User.EdgeOwnerToTimelineMedia.PageInfo.EndCursor
+				j := 0
+				if len(mediaResponse.Data.User.EdgeOwnerToTimelineMedia.Edges) <= 0 {
+					break
+				}
+				for j < len(mediaResponse.Data.User.EdgeOwnerToTimelineMedia.Edges) {
+					MediaTimestamp = mediaResponse.Data.User.EdgeOwnerToTimelineMedia.Edges[j].Node.TakenAtTimestamp
+					if t-MediaTimestamp < (30 * 24 * 60 * 60) {
+						NumberOfPosts30Days++
+					}
+					if t-MediaTimestamp < (90 * 24 * 60 * 60) {
+						NumberOfPosts90Days++
+					}
+					if t-MediaTimestamp < (180 * 24 * 60 * 60) {
+						NumberOfPosts180Days++
+					}
+					j++
+				}
+				time.Sleep(1 * time.Second)
+				i++
+			}
+		}
+		row = append(row, float64(NumberOfPosts30Days)/4)
+		row = append(row, float64(NumberOfPosts90Days)/12)
+		row = append(row, float64(NumberOfPosts180Days)/24)
+		row = append(row, BestEngagement)
+		row = append(row, avgEngagement)
+		row = append(row, (avgEngagement - BestEngagement))
+		row = append(row, TotalComments/12)
+		row = append(row, (BestEngagement)-(TotalComments/(12*float64(Followers))))
+		finalValues = append(finalValues, row)
+		fmt.Println(finalValues)
 	}
-	row = append(row, float64(NumberOfPosts30Days)/4)
-	row = append(row, float64(NumberOfPosts90Days)/12)
-	row = append(row, float64(NumberOfPosts180Days)/24)
-	row = append(row, BestEngagement)
-	row = append(row, avgEngagement)
-	row = append(row, (avgEngagement - BestEngagement))
-	row = append(row, TotalComments/12)
-	row = append(row, (BestEngagement)-(TotalComments/(12*float64(Followers))))
-	finalValues = append(finalValues, row)
-	fmt.Println(finalValues)
 	return finalValues
 }
 
