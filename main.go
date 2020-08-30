@@ -27,7 +27,7 @@ func main() {
 
 	router := fasthttprouter.New()
 	router.GET("/v1/get/ig/report/username=:USERNAME", handleSaveIGReportToSheets)
-	log.Fatal(fasthttp.ListenAndServe(":8011", router.Handler))
+	log.Fatal(fasthttp.ListenAndServe(":3003", router.Handler))
 }
 
 func handleSaveIGReportToSheets(ctx *fasthttp.RequestCtx) {

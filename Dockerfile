@@ -15,6 +15,6 @@ RUN go mod vendor
 
 RUN go build -o ig-reports
 
-EXPOSE 8010
+EXPOSE 3003
 
 CMD ["./ig-reports"]
