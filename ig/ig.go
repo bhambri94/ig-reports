@@ -23,6 +23,7 @@ func GetReport(userName string) [][]interface{} {
 	}
 	fmt.Println("Successfully Opened output.json")
 	byteValue, _ := ioutil.ReadAll(jsonFile)
+	fmt.Println(string(byteValue))
 	defer jsonFile.Close()
 	var igResponse IGResponse
 	json.Unmarshal(byteValue, &igResponse)

@@ -104,10 +104,16 @@ func handleSaveIGReportToSheets(ctx *fasthttp.RequestCtx) {
 	finalValues := ig.GetReport(userName.(string))
 	if len(finalValues) > 0 {
 		googleSheets.BatchAppend(configs.Configurations.SheetNameWithRange, finalValues)
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		ctx.Response.SetStatusCode(200)
+		ctx.SetBody([]byte("Success Google Sheet Updated"))
+		sugar.Infof("calling ig reprts success!")
+	} else {
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		ctx.Response.SetStatusCode(200)
+		ctx.SetBody([]byte("Something went wrong, not able to fetch data"))
+		sugar.Infof("calling ig reprts failure!")
 	}
-	ctx.Response.Header.Set("Content-Type", "application/json")
-	ctx.Response.SetStatusCode(200)
-	ctx.SetBody([]byte("Success Google Sheet Updated"))
-	sugar.Infof("calling ig reprts success!")
+
 	// sugar.Infof(string(ctx.Request.Body()))
 }
