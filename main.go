@@ -57,14 +57,14 @@ func handleSaveIGReportToSheets(ctx *fasthttp.RequestCtx) {
 		fmt.Println(string(resp))
 		actual := strings.Index(string(resp), "<script type=\"text/javascript\">window._sharedData")
 		end := strings.Index(string(resp), "<script type=\"text/javascript\">window.__initialDataLoaded(window._sharedData);</script>")
-		if actual < 1000 && end < 1000 {
-			sugar.Infof("queryString for search is nil ")
-			ctx.Response.Header.Set("Content-Type", "application/json")
-			ctx.Response.SetStatusCode(200)
-			ctx.SetBody([]byte("Failed! Unable to Find USERNAME shared in URL"))
-			sugar.Infof("calling ig reprts failure due to username!")
-			return
-		}
+		// if actual < 1000 && end < 1000 {
+		// 	sugar.Infof("queryString for search is nil ")
+		// 	ctx.Response.Header.Set("Content-Type", "application/json")
+		// 	ctx.Response.SetStatusCode(200)
+		// 	ctx.SetBody([]byte("Failed! Unable to Find USERNAME shared in URL"))
+		// 	sugar.Infof("calling ig reprts failure due to username!")
+		// 	return
+		// }
 		filteredString := (string(resp)[actual+len("<script type=\"text/javascript\">window._sharedData")+2 : end-11])
 		fo, err := os.Create("uploads/output.json")
 		if err != nil {
