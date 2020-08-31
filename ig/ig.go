@@ -112,7 +112,7 @@ func GetReport(userName string) [][]interface{} {
 		row = append(row, avgEngagement)
 		row = append(row, (avgEngagement - BestEngagement))
 		row = append(row, TotalComments/12)
-		row = append(row, (BestEngagement)-(TotalComments/(12*float64(Followers))))
+		row = append(row, (BestEngagement)-(TotalLikes/(12*float64(Followers))))
 		finalValues = append(finalValues, row)
 		fmt.Println(finalValues)
 	}
