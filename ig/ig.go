@@ -42,7 +42,7 @@ func GetReport(userName string) [][]interface{} {
 		row = append(row, igResponse.EntryData.ProfilePage[0].Graphql.User.Username)
 		Followers := igResponse.EntryData.ProfilePage[0].Graphql.User.EdgeFollowedBy.Count
 		row = append(row, Followers)
-		row = append(row, "NA")
+		// row = append(row, "NA")
 		row = append(row, igResponse.EntryData.ProfilePage[0].Graphql.User.EdgeOwnerToTimelineMedia.Count)
 
 		i := 0
