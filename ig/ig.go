@@ -72,8 +72,8 @@ func GetReport(userName string) [][]interface{} {
 		MediaTimestamp := t - 1
 		Days := 180
 		i = 0
-		if EndCursor != "" {
-			for t-MediaTimestamp < (Days * 24 * 60 * 60) {
+		for t-MediaTimestamp < (Days * 24 * 60 * 60) {
+			if EndCursor != "" || len(EndCursor) > 0 {
 				URL := "https://www.instagram.com/graphql/query/?query_hash=bfa387b2992c3a52dcbe447467b4b771&variables=%7B%22id%22%3A%22" + userId + "%22%2C%22first%22%3A12%2C%22after%22%3A%22" + EndCursor[:len(EndCursor)-2] + "%3D%3D%22%7D"
 				fmt.Println(URL)
 				resp, err := soup.Get(URL)
@@ -102,6 +102,8 @@ func GetReport(userName string) [][]interface{} {
 				}
 				time.Sleep(1 * time.Second)
 				i++
+			} else {
+				break
 			}
 		}
 		row = append(row, float64(NumberOfPosts30Days)/4)
