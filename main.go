@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/bhambri94/ig-reports/configs"
+	"github.com/bhambri94/ig-reports/googleSheets"
 	"github.com/bhambri94/ig-reports/ig"
 	"github.com/buaazp/fasthttprouter"
 	"github.com/valyala/fasthttp"
@@ -133,7 +134,7 @@ func handleSaveIGReportToSheets(ctx *fasthttp.RequestCtx) {
 	finalValues := ig.GetReport(userName.(string))
 	if len(finalValues) > 0 {
 		fmt.Println(finalValues)
-		// googleSheets.BatchAppend(configs.Configurations.SheetNameWithRange, finalValues)
+		googleSheets.BatchAppend(configs.Configurations.SheetNameWithRange, finalValues)
 		ctx.Response.Header.Set("Content-Type", "application/json")
 		ctx.Response.SetStatusCode(200)
 		ctx.SetBody([]byte("Success Google Sheet Updated"))
