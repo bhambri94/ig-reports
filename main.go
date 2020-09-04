@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -9,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/bhambri94/ig-reports/configs"
-	"github.com/bhambri94/ig-reports/googleSheets"
 	"github.com/bhambri94/ig-reports/ig"
 	"github.com/buaazp/fasthttprouter"
 	"github.com/valyala/fasthttp"
@@ -54,14 +54,14 @@ func handleSaveIGReportToSheets(ctx *fasthttp.RequestCtx) {
 	req.Header.Set("Authority", "www.instagram.com")
 	req.Header.Set("Cache-Control", "max-age=0")
 	req.Header.Set("Upgrade-Insecure-Requests", "1")
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36")
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36")
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
 	req.Header.Set("Sec-Fetch-Site", "same-origin")
 	req.Header.Set("Sec-Fetch-Mode", "navigate")
 	req.Header.Set("Sec-Fetch-User", "?1")
 	req.Header.Set("Sec-Fetch-Dest", "document")
 	req.Header.Set("Accept-Language", "en-GB,en-US;q=0.9,en;q=0.8")
-	req.Header.Set("Cookie", "mid=XSMB8QAEAAEs3mQemNZLh2dhx98f; csrftoken=rw7g6gb8R4hHEXyuFeGCZVXs4SoFiqgP; ds_user_id=1270182093; sessionid=1270182093%3AEP9oNwncijl685%3A8; ig_did=EBB71BE2-8122-414C-9E28-4946DF598A00; datr=mgUcXzN0FK6UZc2wKHzFVdS8; shbid=18143; rur=ATN; shbts=1598738545.242118; urlgen=\"{\"106.206.95.145\": 45609054 \"49.207.203.212\": 24309}:1kCP8P:HaO55LPOIi_A2YxUazM62PP9fqs\"")
+	// req.Header.Set("Cookie", "mid=XSMB8QAEAAEs3mQemNZLh2dhx98f; csrftoken=rw7g6gb8R4hHEXyuFeGCZVXs4SoFiqgP; ds_user_id=1270182093; sessionid=1270182093%3AEP9oNwncijl685%3A8; ig_did=EBB71BE2-8122-414C-9E28-4946DF598A00; datr=mgUcXzN0FK6UZc2wKHzFVdS8; shbid=18143; rur=ATN; shbts=1598738545.242118; urlgen=\"{\"106.206.95.145\": 45609054 \"49.207.203.212\": 24309}:1kCP8P:HaO55LPOIi_A2YxUazM62PP9fqs\"")
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -132,7 +132,8 @@ func handleSaveIGReportToSheets(ctx *fasthttp.RequestCtx) {
 	}
 	finalValues := ig.GetReport(userName.(string))
 	if len(finalValues) > 0 {
-		googleSheets.BatchAppend(configs.Configurations.SheetNameWithRange, finalValues)
+		fmt.Println(finalValues)
+		// googleSheets.BatchAppend(configs.Configurations.SheetNameWithRange, finalValues)
 		ctx.Response.Header.Set("Content-Type", "application/json")
 		ctx.Response.SetStatusCode(200)
 		ctx.SetBody([]byte("Success Google Sheet Updated"))
