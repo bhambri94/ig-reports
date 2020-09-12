@@ -153,8 +153,17 @@ func GetUserID(userName string) string {
 		return ""
 	} else {
 		actual := strings.Index(string(body), "<script type=\"text/javascript\">window._sharedData")
+		if actual == -1 {
+			return ""
+		}
 		end := strings.Index(string(body), "<script type=\"text/javascript\">window.__initialDataLoaded(window._sharedData);</script>")
+		if end == -1 {
+			return ""
+		}
 		filteredString := (string(body)[actual+len("<script type=\"text/javascript\">window._sharedData")+2 : end-11])
+		if filteredString == "" {
+			return ""
+		}
 		var igResponse IGResponse
 		json.Unmarshal([]byte(filteredString), &igResponse)
 		if len(igResponse.EntryData.ProfilePage) > 0 {
@@ -261,6 +270,7 @@ func GetIGReport(userNames []string, SearchQuery map[string]int) [][]interface{}
 			actual := strings.Index(string(body), "<script type=\"text/javascript\">window._sharedData")
 			end := strings.Index(string(body), "<script type=\"text/javascript\">window.__initialDataLoaded(window._sharedData);</script>")
 			filteredString := (string(body)[actual+len("<script type=\"text/javascript\">window._sharedData")+2 : end-11])
+			fmt.Println(filteredString)
 			var igResponse IGResponse
 			json.Unmarshal([]byte(filteredString), &igResponse)
 			TotalLikes := 0.0
