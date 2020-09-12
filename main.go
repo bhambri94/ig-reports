@@ -144,6 +144,7 @@ func handleSaveIGReportToSheets(ctx *fasthttp.RequestCtx) {
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	sugar.Infof(Url)
+	var filteredString string
 	if err != nil {
 		sugar.Infof("Api not responding")
 		ctx.Response.Header.Set("Content-Type", "application/json")
@@ -153,7 +154,27 @@ func handleSaveIGReportToSheets(ctx *fasthttp.RequestCtx) {
 		return
 	} else {
 		actual := strings.Index(string(body), "<script type=\"text/javascript\">window._sharedData")
-		end := strings.Index(string(body), "<script type=\"text/javascript\">window.__initialDataLoaded(window._sharedData);</script>")
+		if actual != -1 {
+			end := strings.Index(string(body), "<script type=\"text/javascript\">window.__initialDataLoaded(window._sharedData);</script>")
+			if end != -1 {
+				filteredString := (string(body)[actual+len("<script type=\"text/javascript\">window._sharedData")+2 : end-11])
+				fmt.Println(filteredString)
+			} else {
+				sugar.Infof("-1 While finding json on profile")
+				ctx.Response.Header.Set("Content-Type", "application/json")
+				ctx.Response.SetStatusCode(200)
+				ctx.SetBody([]byte("Failed! Something went wrong to fetch details for this User"))
+				sugar.Infof("calling ig reprts failure due to api no response!")
+				return
+			}
+		} else {
+			sugar.Infof("-1 While finding json on profile")
+			ctx.Response.Header.Set("Content-Type", "application/json")
+			ctx.Response.SetStatusCode(200)
+			ctx.SetBody([]byte("Failed! Something went wrong to fetch details for this User"))
+			sugar.Infof("calling ig reprts failure due to api no response!")
+			return
+		}
 		// if actual < 1000 && end < 1000 {
 		// 	sugar.Infof("queryString for search is nil ")
 		// 	ctx.Response.Header.Set("Content-Type", "application/json")
@@ -162,8 +183,6 @@ func handleSaveIGReportToSheets(ctx *fasthttp.RequestCtx) {
 		// 	sugar.Infof("calling ig reprts failure due to username!")
 		// 	return
 		// }
-		filteredString := (string(body)[actual+len("<script type=\"text/javascript\">window._sharedData")+2 : end-11])
-		fmt.Println(filteredString)
 		fo, err := os.Create("uploads/output.json")
 		if err != nil {
 			sugar.Infof("Unable to create file")
