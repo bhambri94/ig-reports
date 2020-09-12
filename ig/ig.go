@@ -275,8 +275,17 @@ func GetIGReport(userNames []string, SearchQuery map[string]int) [][]interface{}
 			continue
 		} else {
 			actual := strings.Index(string(body), "<script type=\"text/javascript\">window._sharedData")
+			if actual == -1 {
+				continue
+			}
 			end := strings.Index(string(body), "<script type=\"text/javascript\">window.__initialDataLoaded(window._sharedData);</script>")
+			if actual == -1 {
+				continue
+			}
 			filteredString := (string(body)[actual+len("<script type=\"text/javascript\">window._sharedData")+2 : end-11])
+			if filteredString == "" {
+				continue
+			}
 			fmt.Println(filteredString)
 			var igResponse IGResponse
 			json.Unmarshal([]byte(filteredString), &igResponse)
