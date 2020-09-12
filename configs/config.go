@@ -8,8 +8,9 @@ import (
 )
 
 type Configs struct {
-	SpreadsheetID      string `json:"SpreadsheetID"`
-	SheetNameWithRange string `json:"SheetNameWithRange"`
+	SpreadsheetID       string `json:"SpreadsheetID"`
+	SheetNameWithRange  string `json:"SheetNameWithRange"`
+	ResearchJRSheetName string `json:"ResearchJRSheetName"`
 }
 
 var (
