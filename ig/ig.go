@@ -126,7 +126,28 @@ func GetReport(userName string) [][]interface{} {
 }
 func GetUserID(userName string) string {
 	Url := "http://www.instagram.com/" + userName + "/"
-	body, err := soup.Get(Url)
+	req, err := http.NewRequest("GET", Url, nil)
+	if err != nil {
+		// handle err
+	}
+	req.Header.Set("Authority", "www.instagram.com")
+	req.Header.Set("Cache-Control", "max-age=0")
+	req.Header.Set("Upgrade-Insecure-Requests", "1")
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36")
+	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
+	req.Header.Set("Sec-Fetch-Site", "same-origin")
+	req.Header.Set("Sec-Fetch-Mode", "navigate")
+	req.Header.Set("Sec-Fetch-User", "?1")
+	req.Header.Set("Sec-Fetch-Dest", "document")
+	req.Header.Set("Accept-Language", "en-GB,en-US;q=0.9,en;q=0.8")
+	req.Header.Set("Cookie", "mid=XSMB8QAEAAEs3mQemNZLh2dhx98f; ig_did=EBB71BE2-8122-414C-9E28-4946DF598A00; datr=mgUcXzN0FK6UZc2wKHzFVdS8; fbm_124024574287414=base_domain=.instagram.com; shbid=18143; shbts=1599896664.3834596; rur=ATN; fbsr_124024574287414=Gx2jo4u1YNucR8uhdoS_OZz11ssN3ZH1Hm99OsmpsrE.eyJ1c2VyX2lkIjoiMTAwMDAyMDg2MzA5OTAzIiwiY29kZSI6IkFRREFOUlJ5VUtRN3BwaENSY1BGOVNLM3hvb1hVb2Q2UFBDMkJpaGtuUkVnd3BPQTZuc1dSVHdUbzNQUldxdjFnZi1nM0EwMlhDY01rZE9qQ1lzMzB1Z19KanZVUENVc2d5YzhFcml2cUNGU3pmOERaUUpRSXVFc2NxTGNNeWw0WlU2dURidHdZekRQWFJHQUhnQ0g0bkNvb3R0NnZyUWFkdGJ0SWV0d3BwcnZNc2hTbUJidmNab2tndkVxd3h1N3Jyd3FrU2F0OGdiT0xYWG1rV3p1T2QzT2tLUVRVdlBXc2xWOHpRellwal9sbjMzVjZPb0tFNmZMNm9TVnhNZk0wdU1aanprWDFPZ0IweFlmYU1PcHJGMW9qcUFmakJUMGJGUVl2LWVuZlNYeHIyS29uVS1LTzJrdl96TU9jVVNhTm5KeDJLVDN6NTcyMUhxenIxMlUtZDBRIiwib2F1dGhfdG9rZW4iOiJFQUFCd3pMaXhuallCQU0xbXMxQXJMMXQ2cU5rWGw5RTFnOXYyWkFyUHRyVk9wMHVFZmhHY05HMTJOaFpCZUhRNlFWalI5em1OcU85RU1Bc2pWOE85N2FXcVpCM2tQdkRaQncyb0gyelNrd3Azc0xRMXVMZ2p0OXlLOXE1WkN6QlBXaTRqdTl5bmtvT201NHB1d0s5MTFFSHdvSGgwZlZIWkNaQXkzSXdRa3hrT2NpbkRYZ0RzVzBaQiIsImFsZ29yaXRobSI6IkhNQUMtU0hBMjU2IiwiaXNzdWVkX2F0IjoxNTk5OTEwMzQwfQ; csrftoken=AYPfDg0kdLFbPNZbVHkkJIojQ1wPKSdH; ds_user_id=41309535897; sessionid=41309535897%3A4XfannYCtGdfzr%3A29;")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		// handle err
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("Error")
 		return ""
