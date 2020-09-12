@@ -157,7 +157,7 @@ func handleSaveIGReportToSheets(ctx *fasthttp.RequestCtx) {
 		if actual != -1 {
 			end := strings.Index(string(body), "<script type=\"text/javascript\">window.__initialDataLoaded(window._sharedData);</script>")
 			if end != -1 {
-				filteredString := (string(body)[actual+len("<script type=\"text/javascript\">window._sharedData")+2 : end-11])
+				filteredString = (string(body)[actual+len("<script type=\"text/javascript\">window._sharedData")+2 : end-11])
 				fmt.Println(filteredString)
 			} else {
 				sugar.Infof("-1 While finding json on profile")
