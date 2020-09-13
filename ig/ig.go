@@ -246,7 +246,7 @@ func GetIGReport(userNames []string, SearchQuery map[string]int) [][]interface{}
 	parentIterator := 0
 	for parentIterator < len(userNames) {
 		var row []interface{}
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 		Url := "http://www.instagram.com/" + userNames[parentIterator] + "/"
 		req, err := http.NewRequest("GET", Url, nil)
 		if err != nil {
