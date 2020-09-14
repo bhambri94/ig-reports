@@ -120,57 +120,104 @@ func GetReport(userName string) [][]interface{} {
 		row = append(row, TotalComments/12)
 		row = append(row, (BestEngagement)-(TotalLikes/(12*float64(Followers))))
 		finalValues = append(finalValues, row)
-		fmt.Println(finalValues)
 	}
 	return finalValues
 }
-func GetUserID(userName string) string {
-	Url := "http://www.instagram.com/" + userName + "/"
-	req, err := http.NewRequest("GET", Url, nil)
+
+type InstaID struct {
+	ID            string `json:"id"`
+	Username      string `json:"username"`
+	FullName      string `json:"full_name"`
+	ProfilePicURL string `json:"profile_pic_url"`
+	Followers     int    `json:"followers"`
+	Followed      int    `json:"followed"`
+	Biography     string `json:"biography"`
+}
+
+func GetUserIDAndFollower(userName string) (string, int) {
+	req, err := http.NewRequest("GET", "https://commentpicker.com/actions/instagram-id-action.php?username="+userName+"&token=29dd11e760c54402744ef2c3273ea2e3c901f88fb4ae749b4882856568ece7b0", nil)
 	if err != nil {
 		// handle err
 	}
-	req.Header.Set("Authority", "www.instagram.com")
-	req.Header.Set("Cache-Control", "max-age=0")
-	req.Header.Set("Upgrade-Insecure-Requests", "1")
+	req.Header.Set("Authority", "commentpicker.com")
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36")
-	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
+	req.Header.Set("Accept", "*/*")
 	req.Header.Set("Sec-Fetch-Site", "same-origin")
-	req.Header.Set("Sec-Fetch-Mode", "navigate")
-	req.Header.Set("Sec-Fetch-User", "?1")
-	req.Header.Set("Sec-Fetch-Dest", "document")
+	req.Header.Set("Sec-Fetch-Mode", "cors")
+	req.Header.Set("Sec-Fetch-Dest", "empty")
+	req.Header.Set("Referer", "https://commentpicker.com/instagram-user-id.php")
 	req.Header.Set("Accept-Language", "en-GB,en-US;q=0.9,en;q=0.8")
-	req.Header.Set("Cookie", "mid=XSMB8QAEAAEs3mQemNZLh2dhx98f; ig_did=EBB71BE2-8122-414C-9E28-4946DF598A00; datr=mgUcXzN0FK6UZc2wKHzFVdS8; fbm_124024574287414=base_domain=.instagram.com; shbid=18143; shbts=1599896664.3834596; rur=ATN; fbsr_124024574287414=Gx2jo4u1YNucR8uhdoS_OZz11ssN3ZH1Hm99OsmpsrE.eyJ1c2VyX2lkIjoiMTAwMDAyMDg2MzA5OTAzIiwiY29kZSI6IkFRREFOUlJ5VUtRN3BwaENSY1BGOVNLM3hvb1hVb2Q2UFBDMkJpaGtuUkVnd3BPQTZuc1dSVHdUbzNQUldxdjFnZi1nM0EwMlhDY01rZE9qQ1lzMzB1Z19KanZVUENVc2d5YzhFcml2cUNGU3pmOERaUUpRSXVFc2NxTGNNeWw0WlU2dURidHdZekRQWFJHQUhnQ0g0bkNvb3R0NnZyUWFkdGJ0SWV0d3BwcnZNc2hTbUJidmNab2tndkVxd3h1N3Jyd3FrU2F0OGdiT0xYWG1rV3p1T2QzT2tLUVRVdlBXc2xWOHpRellwal9sbjMzVjZPb0tFNmZMNm9TVnhNZk0wdU1aanprWDFPZ0IweFlmYU1PcHJGMW9qcUFmakJUMGJGUVl2LWVuZlNYeHIyS29uVS1LTzJrdl96TU9jVVNhTm5KeDJLVDN6NTcyMUhxenIxMlUtZDBRIiwib2F1dGhfdG9rZW4iOiJFQUFCd3pMaXhuallCQU0xbXMxQXJMMXQ2cU5rWGw5RTFnOXYyWkFyUHRyVk9wMHVFZmhHY05HMTJOaFpCZUhRNlFWalI5em1OcU85RU1Bc2pWOE85N2FXcVpCM2tQdkRaQncyb0gyelNrd3Azc0xRMXVMZ2p0OXlLOXE1WkN6QlBXaTRqdTl5bmtvT201NHB1d0s5MTFFSHdvSGgwZlZIWkNaQXkzSXdRa3hrT2NpbkRYZ0RzVzBaQiIsImFsZ29yaXRobSI6IkhNQUMtU0hBMjU2IiwiaXNzdWVkX2F0IjoxNTk5OTEwMzQwfQ; csrftoken=AYPfDg0kdLFbPNZbVHkkJIojQ1wPKSdH; ds_user_id=41309535897; sessionid=41309535897%3A4XfannYCtGdfzr%3A29;")
+	// req.Header.Set("Cookie", "ezoadgid_186623=-1; ezoref_186623=google.com; ezoab_186623=mod1; ezopvc_186623=1; ezepvv=333; lp_186623=https://commentpicker.com/instagram-user-id.php; ezovid_186623=1668751742; ezovuuid_186623=f0670d60-846a-4a4f-58c9-761391c8c345; ezCMPCCS=true; _ga=GA1.2.1779998933.1599997405; _gid=GA1.2.1575635277.1599997405; _gat=1; ezds=ffid%3D1%2Cw%3D1680%2Ch%3D1050; ezohw=w%3D1680%2Ch%3D916; __utma=131166109.1779998933.1599997405.1599997405.1599997405.1; __utmc=131166109; __utmz=131166109.1599997405.1.1.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not%20provided); __utmt_e=1; __utmt_f=1; __utmb=131166109.2.10.1599997405; ezosuigeneris=b728907b403c347d808888c8ecb1b4a9; cto_bidid=6B9wUV9GSURmQUg3bjNub3l3ZXJ2d0tGa21DVllReEZWaXduJTJGcTRsTlNhcHY3JTJGYXA1Y0lKRXBjWTA3MGZMTSUyQkRrV3Z1YllKOVFocmpDRXlSa0pCY01GeU52Z0dFT3NWYW9IYW9RRngxT2dPVERXTSUzRA; cto_bundle=reOv2F9YZ0J6OXg3cWIyS280QXhXMm9ldyUyRm5VbTA1VFpucEFmNSUyRndvUnRsa1pJaUhZS3N5UlFMVThMbiUyRjZNamt4aVM3Y2dVWHpkczRTTGRSWHVWUUljR2w4SVNNandXZzlVQkFJb1Z5SzU3SmZidXBUamJxMElBWTFVZkE5MFUlMkZnN0UwN0lsNHdDWDclMkJkMWZScWVkYWtUeXRnJTNEJTNE; ezux_lpl_186623=1599997405287|2abf5736-322c-4f4c-71cf-a1c27141c03b|false; ezouspvh=180; __gads=ID=4e92f1d7d26e48fb:T=1599997405:S=ALNI_MbRSd0jOFWnARwEXRaByNHhmtr3kQ; ezouspvv=496; ezouspva=8; __qca=P0-1035202418-1599997410395; ezux_et_186623=13; ezux_tos_186623=14; ezux_ifep_186623=true; ezoawesome_186623=commentpicker_com-medrectangle-2/2020-09-13/555335 1599997422248; active_template::186623=pub_site.1599997422; ezosuigenerisc=44e8e79940ca45b4801e7fdfd413e2d4")
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		// handle err
+		return "", 0
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println("Error")
-		return ""
-	} else {
-		actual := strings.Index(string(body), "<script type=\"text/javascript\">window._sharedData")
-		if actual == -1 {
-			return ""
-		}
-		end := strings.Index(string(body), "<script type=\"text/javascript\">window.__initialDataLoaded(window._sharedData);</script>")
-		if end == -1 {
-			return ""
-		}
-		filteredString := (string(body)[actual+len("<script type=\"text/javascript\">window._sharedData")+2 : end-11])
-		if filteredString == "" {
-			return ""
-		}
-		var igResponse IGResponse
-		json.Unmarshal([]byte(filteredString), &igResponse)
-		if len(igResponse.EntryData.ProfilePage) > 0 {
-			return igResponse.EntryData.ProfilePage[0].Graphql.User.ID
-		}
-	}
-	return ""
+	fmt.Println(string(body))
+	var instaID InstaID
+	json.Unmarshal(body, &instaID)
+	return instaID.ID, instaID.Followers
+
+	// Url := "https://www.instagram.com/graphql/query/?query_hash=bfa387b2992c3a52dcbe447467b4b771&variables=%7B%22id%22%3A%22" + userName + "%22%2C%22first%22%3A12%7D"
+	// fmt.Println(Url)
+	// resp, err := soup.Get(Url)
+	// if err != nil {
+	// 	fmt.Println("username not found")
+	// }
+	// Url := "http://www.instagram.com/" + userName + "/"
+	// req, err := http.NewRequest("GET", Url, nil)
+	// if err != nil {
+	// 	// handle err
+	// }
+	// req.Header.Set("Authority", "www.instagram.com")
+	// req.Header.Set("Cache-Control", "max-age=0")
+	// req.Header.Set("Upgrade-Insecure-Requests", "1")
+	// req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36")
+	// req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
+	// req.Header.Set("Sec-Fetch-Site", "same-origin")
+	// req.Header.Set("Sec-Fetch-Mode", "navigate")
+	// req.Header.Set("Sec-Fetch-User", "?1")
+	// req.Header.Set("Sec-Fetch-Dest", "document")
+	// req.Header.Set("Accept-Language", "en-GB,en-US;q=0.9,en;q=0.8")
+	// req.Header.Set("Cookie", "mid=XSMB8QAEAAEs3mQemNZLh2dhx98f; ig_did=EBB71BE2-8122-414C-9E28-4946DF598A00; datr=mgUcXzN0FK6UZc2wKHzFVdS8; fbm_124024574287414=base_domain=.instagram.com; shbid=18143; shbts=1599896664.3834596; rur=ATN; fbsr_124024574287414=Gx2jo4u1YNucR8uhdoS_OZz11ssN3ZH1Hm99OsmpsrE.eyJ1c2VyX2lkIjoiMTAwMDAyMDg2MzA5OTAzIiwiY29kZSI6IkFRREFOUlJ5VUtRN3BwaENSY1BGOVNLM3hvb1hVb2Q2UFBDMkJpaGtuUkVnd3BPQTZuc1dSVHdUbzNQUldxdjFnZi1nM0EwMlhDY01rZE9qQ1lzMzB1Z19KanZVUENVc2d5YzhFcml2cUNGU3pmOERaUUpRSXVFc2NxTGNNeWw0WlU2dURidHdZekRQWFJHQUhnQ0g0bkNvb3R0NnZyUWFkdGJ0SWV0d3BwcnZNc2hTbUJidmNab2tndkVxd3h1N3Jyd3FrU2F0OGdiT0xYWG1rV3p1T2QzT2tLUVRVdlBXc2xWOHpRellwal9sbjMzVjZPb0tFNmZMNm9TVnhNZk0wdU1aanprWDFPZ0IweFlmYU1PcHJGMW9qcUFmakJUMGJGUVl2LWVuZlNYeHIyS29uVS1LTzJrdl96TU9jVVNhTm5KeDJLVDN6NTcyMUhxenIxMlUtZDBRIiwib2F1dGhfdG9rZW4iOiJFQUFCd3pMaXhuallCQU0xbXMxQXJMMXQ2cU5rWGw5RTFnOXYyWkFyUHRyVk9wMHVFZmhHY05HMTJOaFpCZUhRNlFWalI5em1OcU85RU1Bc2pWOE85N2FXcVpCM2tQdkRaQncyb0gyelNrd3Azc0xRMXVMZ2p0OXlLOXE1WkN6QlBXaTRqdTl5bmtvT201NHB1d0s5MTFFSHdvSGgwZlZIWkNaQXkzSXdRa3hrT2NpbkRYZ0RzVzBaQiIsImFsZ29yaXRobSI6IkhNQUMtU0hBMjU2IiwiaXNzdWVkX2F0IjoxNTk5OTEwMzQwfQ; csrftoken=AYPfDg0kdLFbPNZbVHkkJIojQ1wPKSdH; ds_user_id=41309535897; sessionid=41309535897%3A4XfannYCtGdfzr%3A29;")
+
+	// resp, err := http.DefaultClient.Do(req)
+	// if err != nil {
+	// 	// handle err
+	// }
+	// defer resp.Body.Close()
+	// body, err := ioutil.ReadAll(resp.Body)
+	// if err != nil {
+	// 	fmt.Println("Error")
+	// 	return ""
+	// } else {
+	// 	actual := strings.Index(string(body), "<script type=\"text/javascript\">window._sharedData")
+	// 	if actual == -1 {
+	// 		return ""
+	// 	}
+	// 	end := strings.Index(string(body), "<script type=\"text/javascript\">window.__initialDataLoaded(window._sharedData);</script>")
+	// 	if end == -1 {
+	// 		return ""
+	// 	}
+	// 	filteredString := (string(body)[actual+len("<script type=\"text/javascript\">window._sharedData")+2 : end-11])
+	// 	if filteredString == "" {
+	// 		return ""
+	// 	}
+	// 	var igResponse IGResponse
+	// 	json.Unmarshal([]byte(filteredString), &igResponse)
+	// 	if len(igResponse.EntryData.ProfilePage) > 0 {
+	// 		return igResponse.EntryData.ProfilePage[0].Graphql.User.ID
+	// 	}
+	// }
+	// var igResponse IGResponse
+	// json.Unmarshal([]byte(string(resp)), &igResponse)
+	// if len(igResponse.EntryData.ProfilePage) > 0 {
+	// 	return igResponse.EntryData.ProfilePage[0].Graphql.User.ID
+	// }
+	// return ""
 }
 
 func GetFollowers(userName string, MaxFollowers string) []string {
@@ -180,7 +227,7 @@ func GetFollowers(userName string, MaxFollowers string) []string {
 		MaxFollowersInt = 500
 	}
 	MaxFollowersCount := 0
-	UserID := GetUserID(userName)
+	UserID, _ := GetUserIDAndFollower(userName)
 	fmt.Println("*****")
 	fmt.Println("User Id found: " + UserID)
 	fmt.Println("*****")
@@ -237,7 +284,6 @@ func GetFollowers(userName string, MaxFollowers string) []string {
 		EndCursor = igFollowersResearch.Data.User.EdgeFollow.PageInfo.EndCursor
 		NextPage = igFollowersResearch.Data.User.EdgeFollow.PageInfo.HasNextPage
 	}
-	fmt.Println(finalValues)
 	return finalValues
 }
 
@@ -350,8 +396,223 @@ func GetIGReport(userNames []string, SearchQuery map[string]int) [][]interface{}
 	return finalValues
 }
 
-func GetFinalMapOfResearchedUsers() {
+func GetIGReportNew(userNames []string, SearchQuery map[string]int) [][]interface{} {
+	var finalValues [][]interface{}
+	parentIterator := 0
+	for parentIterator < len(userNames) {
+		var row []interface{}
+		time.Sleep(1000 * time.Millisecond)
+		UserId, _ := GetUserIDAndFollower(userNames[parentIterator])
+		Url := "https://www.instagram.com/graphql/query/?query_hash=bfa387b2992c3a52dcbe447467b4b771&variables=%7B%22id%22%3A%22" + UserId + "%22%2C%22first%22%3A12%7D"
+		fmt.Println(Url)
+		resp, err := soup.Get(Url)
+		fmt.Println(resp)
+		if err != nil {
+			fmt.Println("username not found")
+		}
+		var igResponse AutoGenerated
+		json.Unmarshal([]byte(resp), &igResponse)
+		TotalLikes := 0.0
+		TotalComments := 0.0
+		if len(igResponse.Data.User.EdgeOwnerToTimelineMedia.Edges) > 0 {
+			FollowerURL := "https://www.instagram.com/graphql/query/?query_hash=c76146de99bb02f6415203be841dd25a&variables=%7B%22id%22%3A%22" + UserId + "%22%2C%22include_reel%22%3Afalse%2C%22fetch_mutual%22%3Afalse%2C%22first%22%3A24%7D"
+			fmt.Println(FollowerURL)
+			method := "GET"
+			client := &http.Client{}
+			req, err := http.NewRequest(method, FollowerURL, nil)
+			if err != nil {
+				fmt.Println(err)
+			}
+			req.Header.Add("accept", " */*")
+			req.Header.Add("Cookie", "mid=XSMB8QAEAAEs3mQemNZLh2dhx98f; ig_did=EBB71BE2-8122-414C-9E28-4946DF598A00; datr=mgUcXzN0FK6UZc2wKHzFVdS8; fbm_124024574287414=base_domain=.instagram.com; shbid=18143; shbts=1599896664.3834596; rur=ATN; fbsr_124024574287414=Gx2jo4u1YNucR8uhdoS_OZz11ssN3ZH1Hm99OsmpsrE.eyJ1c2VyX2lkIjoiMTAwMDAyMDg2MzA5OTAzIiwiY29kZSI6IkFRREFOUlJ5VUtRN3BwaENSY1BGOVNLM3hvb1hVb2Q2UFBDMkJpaGtuUkVnd3BPQTZuc1dSVHdUbzNQUldxdjFnZi1nM0EwMlhDY01rZE9qQ1lzMzB1Z19KanZVUENVc2d5YzhFcml2cUNGU3pmOERaUUpRSXVFc2NxTGNNeWw0WlU2dURidHdZekRQWFJHQUhnQ0g0bkNvb3R0NnZyUWFkdGJ0SWV0d3BwcnZNc2hTbUJidmNab2tndkVxd3h1N3Jyd3FrU2F0OGdiT0xYWG1rV3p1T2QzT2tLUVRVdlBXc2xWOHpRellwal9sbjMzVjZPb0tFNmZMNm9TVnhNZk0wdU1aanprWDFPZ0IweFlmYU1PcHJGMW9qcUFmakJUMGJGUVl2LWVuZlNYeHIyS29uVS1LTzJrdl96TU9jVVNhTm5KeDJLVDN6NTcyMUhxenIxMlUtZDBRIiwib2F1dGhfdG9rZW4iOiJFQUFCd3pMaXhuallCQU0xbXMxQXJMMXQ2cU5rWGw5RTFnOXYyWkFyUHRyVk9wMHVFZmhHY05HMTJOaFpCZUhRNlFWalI5em1OcU85RU1Bc2pWOE85N2FXcVpCM2tQdkRaQncyb0gyelNrd3Azc0xRMXVMZ2p0OXlLOXE1WkN6QlBXaTRqdTl5bmtvT201NHB1d0s5MTFFSHdvSGgwZlZIWkNaQXkzSXdRa3hrT2NpbkRYZ0RzVzBaQiIsImFsZ29yaXRobSI6IkhNQUMtU0hBMjU2IiwiaXNzdWVkX2F0IjoxNTk5OTEwMzQwfQ; csrftoken=AYPfDg0kdLFbPNZbVHkkJIojQ1wPKSdH; ds_user_id=41309535897; sessionid=41309535897%3A4XfannYCtGdfzr%3A29;")
+			res, err := client.Do(req)
+			if err != nil {
+				fmt.Println("username not found")
+			}
+			defer res.Body.Close()
+			body, err := ioutil.ReadAll(res.Body)
+			if err != nil {
+				fmt.Println("username not found")
+			}
+			var igFollowersResearch IGFollowersAllResearch
+			json.Unmarshal([]byte(body), &igFollowersResearch)
 
+			Followers := igFollowersResearch.Data.User.EdgeFollowedBy.Count
+			if val, ok := SearchQuery["MinFollower"]; ok {
+				if Followers < val {
+					parentIterator++
+					continue
+				}
+			}
+			if val, ok := SearchQuery["MaxFollower"]; ok {
+				if Followers > val {
+					parentIterator++
+					continue
+				}
+			}
+			i := 0
+			Engagement := make([]int, 12)
+			for i < 12 && i < len(igResponse.Data.User.EdgeOwnerToTimelineMedia.Edges) {
+				Likes := igResponse.Data.User.EdgeOwnerToTimelineMedia.Edges[i].Node.EdgeMediaPreviewLike.Count
+				Comments := igResponse.Data.User.EdgeOwnerToTimelineMedia.Edges[i].Node.EdgeMediaToComment.Count
+				TotalLikes = TotalLikes + float64(Likes)
+				TotalComments = TotalComments + float64(Comments)
+				Engagement[i] = (Likes + Comments)
+				i++
+			}
+			sort.Sort(sort.IntSlice(Engagement))
+			i = 3
+			total := 0
+			for i < 12 {
+				total = total + Engagement[i]
+				i++
+			}
+			BestEngagement := float64(total) / (9 * float64(Followers))
+			BestEngagement = BestEngagement * 100
+			avgEngagement := (float64(TotalLikes) + float64(TotalComments)) / (12 * float64(Followers))
+			avgEngagement = avgEngagement * 100
+			fmt.Println(float64(Followers))
+			fmt.Println(BestEngagement)
+			fmt.Println(avgEngagement)
+			if val, ok := SearchQuery["MinN"]; ok {
+				avgEngagementInt := int(math.Round(avgEngagement))
+				if avgEngagementInt < val {
+					parentIterator++
+					continue
+				}
+			}
+			if val, ok := SearchQuery["MinNStar"]; ok {
+				BestEngagementInt := int(math.Round(BestEngagement))
+				if BestEngagementInt < val {
+					parentIterator++
+					continue
+				}
+			}
+			row = append(row, userNames[parentIterator])
+		}
+		finalValues = append(finalValues, row)
+		parentIterator++
+	}
+	fmt.Println(finalValues)
+	return finalValues
+}
+
+type AutoGenerated struct {
+	Data struct {
+		User struct {
+			EdgeOwnerToTimelineMedia struct {
+				Count    int `json:"count"`
+				PageInfo struct {
+					HasNextPage bool   `json:"has_next_page"`
+					EndCursor   string `json:"end_cursor"`
+				} `json:"page_info"`
+				Edges []struct {
+					Node struct {
+						Typename                string      `json:"__typename"`
+						ID                      string      `json:"id"`
+						GatingInfo              interface{} `json:"gating_info"`
+						FactCheckOverallRating  interface{} `json:"fact_check_overall_rating"`
+						FactCheckInformation    interface{} `json:"fact_check_information"`
+						MediaOverlayInfo        interface{} `json:"media_overlay_info"`
+						SensitivityFrictionInfo interface{} `json:"sensitivity_friction_info"`
+						Dimensions              struct {
+							Height int `json:"height"`
+							Width  int `json:"width"`
+						} `json:"dimensions"`
+						DisplayURL       string `json:"display_url"`
+						DisplayResources []struct {
+							Src          string `json:"src"`
+							ConfigWidth  int    `json:"config_width"`
+							ConfigHeight int    `json:"config_height"`
+						} `json:"display_resources"`
+						IsVideo               bool   `json:"is_video"`
+						MediaPreview          string `json:"media_preview"`
+						TrackingToken         string `json:"tracking_token"`
+						EdgeMediaToTaggedUser struct {
+							Edges []struct {
+								Node struct {
+									User struct {
+										FullName      string `json:"full_name"`
+										ID            string `json:"id"`
+										IsVerified    bool   `json:"is_verified"`
+										ProfilePicURL string `json:"profile_pic_url"`
+										Username      string `json:"username"`
+									} `json:"user"`
+									X float64 `json:"x"`
+									Y float64 `json:"y"`
+								} `json:"node"`
+							} `json:"edges"`
+						} `json:"edge_media_to_tagged_user"`
+						DashInfo struct {
+							IsDashEligible    bool        `json:"is_dash_eligible"`
+							VideoDashManifest interface{} `json:"video_dash_manifest"`
+							NumberOfQualities int         `json:"number_of_qualities"`
+						} `json:"dash_info"`
+						HasAudio           bool   `json:"has_audio"`
+						VideoURL           string `json:"video_url"`
+						VideoViewCount     int    `json:"video_view_count"`
+						EdgeMediaToCaption struct {
+							Edges []struct {
+								Node struct {
+									Text string `json:"text"`
+								} `json:"node"`
+							} `json:"edges"`
+						} `json:"edge_media_to_caption"`
+						Shortcode          string `json:"shortcode"`
+						EdgeMediaToComment struct {
+							Count    int `json:"count"`
+							PageInfo struct {
+								HasNextPage bool   `json:"has_next_page"`
+								EndCursor   string `json:"end_cursor"`
+							} `json:"page_info"`
+							Edges []struct {
+								Node struct {
+									ID              string `json:"id"`
+									Text            string `json:"text"`
+									CreatedAt       int    `json:"created_at"`
+									DidReportAsSpam bool   `json:"did_report_as_spam"`
+									Owner           struct {
+										ID            string `json:"id"`
+										IsVerified    bool   `json:"is_verified"`
+										ProfilePicURL string `json:"profile_pic_url"`
+										Username      string `json:"username"`
+									} `json:"owner"`
+									ViewerHasLiked bool `json:"viewer_has_liked"`
+								} `json:"node"`
+							} `json:"edges"`
+						} `json:"edge_media_to_comment"`
+						EdgeMediaToSponsorUser struct {
+							Edges []interface{} `json:"edges"`
+						} `json:"edge_media_to_sponsor_user"`
+						CommentsDisabled     bool `json:"comments_disabled"`
+						TakenAtTimestamp     int  `json:"taken_at_timestamp"`
+						EdgeMediaPreviewLike struct {
+							Count int           `json:"count"`
+							Edges []interface{} `json:"edges"`
+						} `json:"edge_media_preview_like"`
+						Owner struct {
+							ID       string `json:"id"`
+							Username string `json:"username"`
+						} `json:"owner"`
+						Location                   interface{} `json:"location"`
+						ViewerHasLiked             bool        `json:"viewer_has_liked"`
+						ViewerHasSaved             bool        `json:"viewer_has_saved"`
+						ViewerHasSavedToCollection bool        `json:"viewer_has_saved_to_collection"`
+						ViewerInPhotoOfYou         bool        `json:"viewer_in_photo_of_you"`
+						ViewerCanReshare           bool        `json:"viewer_can_reshare"`
+						ThumbnailSrc               string      `json:"thumbnail_src"`
+						ThumbnailResources         []struct {
+							Src          string `json:"src"`
+							ConfigWidth  int    `json:"config_width"`
+							ConfigHeight int    `json:"config_height"`
+						} `json:"thumbnail_resources"`
+						ProductType string `json:"product_type"`
+					} `json:"node,omitempty"`
+				} `json:"edges"`
+			} `json:"edge_owner_to_timeline_media"`
+		} `json:"user"`
+	} `json:"data"`
+	Status string `json:"status"`
 }
 
 type IGResponse struct {
@@ -727,6 +988,16 @@ type MediaResponse struct {
 		} `json:"user"`
 	} `json:"data"`
 	Status string `json:"status"`
+}
+
+type IGFollowersAllResearch struct {
+	Data struct {
+		User struct {
+			EdgeFollowedBy struct {
+				Count int `json:"count"`
+			} `json:"edge_followed_by"`
+		} `json:"user"`
+	} `json:"data"`
 }
 
 type IGFollowersResearch struct {

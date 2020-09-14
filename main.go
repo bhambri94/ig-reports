@@ -89,10 +89,11 @@ func handleSaveIGResearchToSheets(ctx *fasthttp.RequestCtx) {
 			SearchQuery["MinNStar"] = tempInt
 		}
 	}
-	finalValues := ig.GetIGReport(FollowersList, SearchQuery)
+	finalValues := ig.GetIGReportNew(FollowersList, SearchQuery)
 	fmt.Println("*********")
 	fmt.Println(finalValues)
 	if len(finalValues) > 0 {
+		fmt.Println(finalValues)
 		googleSheets.ClearSheet(configs.Configurations.ResearchJRSheetName)
 		googleSheets.BatchWrite(configs.Configurations.ResearchJRSheetName, finalValues)
 		ctx.Response.Header.Set("Content-Type", "application/json")
