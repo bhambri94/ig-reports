@@ -89,7 +89,7 @@ func handleSaveIGResearchToSheets(ctx *fasthttp.RequestCtx) {
 			SearchQuery["MinNStar"] = tempInt
 		}
 	}
-	finalValues := ig.GetIGReportNew(FollowersList, SearchQuery)
+	finalValues, NoOneSucceededBoolean := ig.GetIGReportNew(FollowersList, SearchQuery)
 	fmt.Println("*********")
 	fmt.Println(finalValues)
 	if len(finalValues) > 0 {
@@ -99,6 +99,11 @@ func handleSaveIGResearchToSheets(ctx *fasthttp.RequestCtx) {
 		ctx.Response.Header.Set("Content-Type", "application/json")
 		ctx.Response.SetStatusCode(200)
 		ctx.SetBody([]byte("Success Google Sheet Updated"))
+		sugar.Infof("calling ig research reports success!")
+	} else if NoOneSucceededBoolean {
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		ctx.Response.SetStatusCode(200)
+		ctx.SetBody([]byte("Noone passed the filter search query"))
 		sugar.Infof("calling ig research reports success!")
 	} else {
 		ctx.Response.Header.Set("Content-Type", "application/json")
