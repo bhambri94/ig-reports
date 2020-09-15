@@ -49,7 +49,7 @@ func GetReportNew(userName string) [][]interface{} {
 			fmt.Println(err)
 		}
 		req.Header.Add("accept", " */*")
-		req.Header.Add("Cookie", "ig_did=2E8DBEA9-6BAB-4214-BE14-3E92C1956C79; mid=X2Cs0AAEAAH4q10wWRKpkOR7Vcxk; csrftoken=85768r6cbvT6MHcJ7JXRjAz30M7ZyWWP; ds_user_id=41670979469; sessionid=41670979469%3AXIijRyjzHto0c7%3A26; rur=PRN;")
+//		req.Header.Add("Cookie", "ig_did=2E8DBEA9-6BAB-4214-BE14-3E92C1956C79; mid=X2Cs0AAEAAH4q10wWRKpkOR7Vcxk; csrftoken=85768r6cbvT6MHcJ7JXRjAz30M7ZyWWP; ds_user_id=41670979469; sessionid=41670979469%3AXIijRyjzHto0c7%3A26; rur=PRN;")
 		res, err := client.Do(req)
 		if err != nil {
 			fmt.Println("username not found")
@@ -386,7 +386,7 @@ func GetFollowers(userName string, MaxFollowers string) []string {
 			fmt.Println(err)
 		}
 		req.Header.Add("accept", " */*")
-		req.Header.Add("Cookie", "ig_did=2E8DBEA9-6BAB-4214-BE14-3E92C1956C79; mid=X2Cs0AAEAAH4q10wWRKpkOR7Vcxk; csrftoken=85768r6cbvT6MHcJ7JXRjAz30M7ZyWWP; ds_user_id=41670979469; sessionid=41670979469%3AXIijRyjzHto0c7%3A26; rur=PRN;")
+//		req.Header.Add("Cookie", "ig_did=2E8DBEA9-6BAB-4214-BE14-3E92C1956C79; mid=X2Cs0AAEAAH4q10wWRKpkOR7Vcxk; csrftoken=85768r6cbvT6MHcJ7JXRjAz30M7ZyWWP; ds_user_id=41670979469; sessionid=41670979469%3AXIijRyjzHto0c7%3A26; rur=PRN;")
 
 		// req.Header.Add("cookie", "mid=XSMB8QAEAAEs3mQemNZLh2dhx98f; ig_did=EBB71BE2-8122-414C-9E28-4946DF598A00; datr=mgUcXzN0FK6UZc2wKHzFVdS8; fbm_124024574287414=base_domain=.instagram.com; shbid=18143; shbts=1599896664.3834596; rur=ATN; fbsr_124024574287414=gO0ZKWcK57Alnu3dYwqdbq0dRLKS9Dkj6l1TY1m4HoU.eyJ1c2VyX2lkIjoiMTAwMDAyMDg2MzA5OTAzIiwiY29kZSI6IkFRQ3ZUSlVvTkFxM2Nqbzc2TGZta3lGa3pFel9Td0pjS2hpOVFBSTBNaUs3aUdzTXYyWUU1Tkp3MGkyN0Z1UFU2N2pCM2wtVVRubjdlMkhkQTVaZ1ZWQjZZWDVuVGNvNE5HQ3VHZklJczZwTW1sdkh2ZXVnY1V6ZHZGajZqWW1TMUlvX2lMdDB1c3V2emg3U2ZNUkxCY3FMeEhVTnVQS3pIZkc2VTJ1bHhRV1EwQVVVYkNOVkduQ0dVQy1jUlZWRFVEMGVUckxEb0VNSDBTNGtKODk0bk9Valh0WnhMOEVsTWxGTmdZVHhVZmtRUUEwcnhfNnRfUlltdlJTVnZzb2hzRE1WVVNfOXVrbE9Rc1djM0JEdm5PeFR4WDhBaXhkMERsN25zOW9SeFNmczRWeU1vNldTYWFkWTBhaElpSHVRNjh2Z0dqQ2xfNmlxNEZmVmNlb2M1Mk81Iiwib2F1dGhfdG9rZW4iOiJFQUFCd3pMaXhuallCQUIxY252YVNqUmtuY3kxeUNEUnM2cTVBWkF3N0ozYWRlaWRhSHlLVkxwY1pBUzRScHBmT3lPR1F1Nm03SEtwOUJCRzZQcFhkdjhaQ3BWd1pBT0ZaQWxXU0p5WGdSOFkxTExDT0prS2NYbjhpT1l1MDUzc2lPcHJja3U4SXd3YWdVb1pCcmFraldQTzlaQzhIUHNqMkZMZFZJMEF6TWNzQ1haQjlucG5jNFk5byIsImFsZ29yaXRobSI6IkhNQUMtU0hBMjU2IiwiaXNzdWVkX2F0IjoxNTk5OTAwMjIxfQ; csrftoken=CZVniHggvmGG9S2FIUlnTmzzACw0hWAF; sessionid=1270182093%3AEP9oNwncijl685%3A8;")
 
@@ -555,7 +555,7 @@ func GetIGReportNew(userNames []string, SearchQuery map[string]int) ([][]interfa
 				fmt.Println(err)
 			}
 			req.Header.Add("accept", " */*")
-			req.Header.Add("Cookie", "ig_did=2E8DBEA9-6BAB-4214-BE14-3E92C1956C79; mid=X2Cs0AAEAAH4q10wWRKpkOR7Vcxk; csrftoken=85768r6cbvT6MHcJ7JXRjAz30M7ZyWWP; ds_user_id=41670979469; sessionid=41670979469%3AXIijRyjzHto0c7%3A26; rur=PRN;")
+//			req.Header.Add("Cookie", "ig_did=2E8DBEA9-6BAB-4214-BE14-3E92C1956C79; mid=X2Cs0AAEAAH4q10wWRKpkOR7Vcxk; csrftoken=85768r6cbvT6MHcJ7JXRjAz30M7ZyWWP; ds_user_id=41670979469; sessionid=41670979469%3AXIijRyjzHto0c7%3A26; rur=PRN;")
 			res, err := client.Do(req)
 			if err != nil {
 				fmt.Println("username not found")
