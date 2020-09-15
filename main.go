@@ -29,7 +29,7 @@ func main() {
 	defer logger.Sync()
 
 	router := fasthttprouter.New()
-	router.GET("/v1/get/ig/report/username=:USERNAME", handleSaveIGReportToSheets)
+	router.GET("/v1/get/ig/report/username=:USERNAME", handleSaveIGReportToSheetsNew)
 	router.GET("/v1/get/ig/research/username=:USERNAME/LatestFollowerCount=:LatestFollowerCount/MinFollower=:MinFollower/MaxFollower=:MaxFollower/MinN=:MinN/MinNStar=:MinNStar", handleSaveIGResearchToSheets)
 	log.Fatal(fasthttp.ListenAndServe(":3003", router.Handler))
 }
@@ -54,6 +54,12 @@ func handleSaveIGResearchToSheets(ctx *fasthttp.RequestCtx) {
 	MaxFollower := ctx.UserValue("MaxFollower")
 	MinN := ctx.UserValue("MinN")
 	MinNStar := ctx.UserValue("MinNStar")
+	fmt.Println(userName)
+	fmt.Println(LatestFollowerCount)
+	fmt.Println(MinFollower)
+	fmt.Println(MaxFollower)
+	fmt.Println(MinN)
+	fmt.Println(MinNStar)
 
 	FollowersList := ig.GetFollowers(userName.(string), LatestFollowerCount.(string)[1:len(LatestFollowerCount.(string))-1])
 	SearchQuery := make(map[string]int)
@@ -227,6 +233,33 @@ func handleSaveIGReportToSheets(ctx *fasthttp.RequestCtx) {
 		}
 	}
 	finalValues := ig.GetReport(userName.(string))
+	if len(finalValues) > 0 {
+		googleSheets.BatchAppend(configs.Configurations.SheetNameWithRange, finalValues)
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		ctx.Response.SetStatusCode(200)
+		ctx.SetBody([]byte("Success Google Sheet Updated"))
+		sugar.Infof("calling ig reprts success!")
+	} else {
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		ctx.Response.SetStatusCode(200)
+		ctx.SetBody([]byte("Something went wrong, not able to fetch data"))
+		sugar.Infof("calling ig reprts failure!")
+	}
+}
+
+func handleSaveIGReportToSheetsNew(ctx *fasthttp.RequestCtx) {
+	configs.SetConfig()
+	sugar.Infof("received a Save IG report request to Google Sheets!")
+	userName := ctx.UserValue("USERNAME")
+	if userName == nil {
+		sugar.Infof("queryString for search is nil ")
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		ctx.Response.SetStatusCode(200)
+		ctx.SetBody([]byte("Failed! Unable to Find USERNAME shared in URL"))
+		sugar.Infof("calling ig reprts failure due to username!")
+		return
+	}
+	finalValues := ig.GetReportNew(userName.(string))
 	if len(finalValues) > 0 {
 		googleSheets.BatchAppend(configs.Configurations.SheetNameWithRange, finalValues)
 		ctx.Response.Header.Set("Content-Type", "application/json")
