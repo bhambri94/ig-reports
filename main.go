@@ -30,7 +30,7 @@ func main() {
 
 	router := fasthttprouter.New()
 	router.GET("/v1/get/ig/report/username=:USERNAME", handleSaveIGReportToSheetsNew)
-	router.GET("/v1/get/ig/research/username=:USERNAME/LatestFollowerCount=:LatestFollowerCount/MinFollower=:MinFollower/MaxFollower=:MaxFollower/MinN=:MinN/MinNStar=:MinNStar", handleSaveIGResearchToSheets)
+	router.GET("/v1/get/ig/research/username=:USERNAME/LatestFollowerCount=:LatestFollowerCount/MinFollower=:MinFollower/MaxFollower=:MaxFollower/MinN=:MinN/MinNStar=:MinNStar/SessionID=:SessionID", handleSaveIGResearchToSheets)
 	log.Fatal(fasthttp.ListenAndServe(":3003", router.Handler))
 }
 
@@ -54,14 +54,20 @@ func handleSaveIGResearchToSheets(ctx *fasthttp.RequestCtx) {
 	MaxFollower := ctx.UserValue("MaxFollower")
 	MinN := ctx.UserValue("MinN")
 	MinNStar := ctx.UserValue("MinNStar")
+	SessionID := ctx.UserValue("SessionID")
+	if SessionID != nil {
+		temp := SessionID.(string)
+		temp = temp[1 : len(temp)-1]
+		SessionID = temp
+	}
 	fmt.Println(userName)
 	fmt.Println(LatestFollowerCount)
 	fmt.Println(MinFollower)
 	fmt.Println(MaxFollower)
 	fmt.Println(MinN)
 	fmt.Println(MinNStar)
-
-	FollowersList := ig.GetFollowers(userName.(string), LatestFollowerCount.(string)[1:len(LatestFollowerCount.(string))-1])
+	fmt.Println(SessionID)
+	FollowersList := ig.GetFollowers(userName.(string), LatestFollowerCount.(string)[1:len(LatestFollowerCount.(string))-1], SessionID.(string))
 	SearchQuery := make(map[string]int)
 	if MinFollower != nil {
 		temp := MinFollower.(string)
@@ -95,7 +101,7 @@ func handleSaveIGResearchToSheets(ctx *fasthttp.RequestCtx) {
 			SearchQuery["MinNStar"] = tempInt
 		}
 	}
-	finalValues, NoOneSucceededBoolean := ig.GetIGReportNew(FollowersList, SearchQuery)
+	finalValues, NoOneSucceededBoolean := ig.GetIGReportNew(FollowersList, SearchQuery, SessionID.(string))
 	fmt.Println("*********")
 	fmt.Println(finalValues)
 	if len(finalValues) > 0 {
