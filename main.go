@@ -29,7 +29,7 @@ func main() {
 	defer logger.Sync()
 
 	router := fasthttprouter.New()
-	router.GET("/v1/get/ig/report/username=:USERNAME", handleSaveIGReportToSheetsNew)
+	router.GET("/v1/get/ig/report/username=:USERNAME/SessionID:=SessionID", handleSaveIGReportToSheetsNew)
 	router.GET("/v1/get/ig/research/username=:USERNAME/LatestFollowerCount=:LatestFollowerCount/MinFollower=:MinFollower/MaxFollower=:MaxFollower/MinN=:MinN/MinNStar=:MinNStar/SessionID=:SessionID", handleSaveIGResearchToSheets)
 	log.Fatal(fasthttp.ListenAndServe(":3003", router.Handler))
 }
@@ -265,7 +265,11 @@ func handleSaveIGReportToSheetsNew(ctx *fasthttp.RequestCtx) {
 		sugar.Infof("calling ig reprts failure due to username!")
 		return
 	}
-	finalValues := ig.GetReportNew(userName.(string))
+	SessionID := ctx.UserValue("SessionID")
+	if SessionID == nil {
+		SessionID = ""
+	}
+	finalValues := ig.GetReportNew(userName.(string), SessionID.(string))
 	if len(finalValues) > 0 {
 		googleSheets.BatchAppend(configs.Configurations.SheetNameWithRange, finalValues)
 		ctx.Response.Header.Set("Content-Type", "application/json")

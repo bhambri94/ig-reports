@@ -16,7 +16,7 @@ import (
 	"github.com/bhambri94/ig-reports/configs"
 )
 
-func GetReportNew(userName string) [][]interface{} {
+func GetReportNew(userName string, SessionID string) [][]interface{} {
 	var finalValues [][]interface{}
 	NumberOfPosts30Days := 0
 	NumberOfPosts90Days := 0
@@ -50,6 +50,9 @@ func GetReportNew(userName string) [][]interface{} {
 			fmt.Println(err)
 		}
 		req.Header.Add("accept", " */*")
+		if SessionID == "" {
+			SessionID = configs.Configurations.SessionId
+		}
 		req.Header.Add("Cookie", "sessionid="+configs.Configurations.SessionId)
 		//		req.Header.Add("Cookie", "ig_did=2E8DBEA9-6BAB-4214-BE14-3E92C1956C79; mid=X2Cs0AAEAAH4q10wWRKpkOR7Vcxk; csrftoken=85768r6cbvT6MHcJ7JXRjAz30M7ZyWWP; ds_user_id=41670979469; sessionid=41670979469%3AXIijRyjzHto0c7%3A26; rur=PRN;")
 		res, err := client.Do(req)
