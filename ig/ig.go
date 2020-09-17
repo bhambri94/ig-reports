@@ -93,6 +93,10 @@ func GetReportNew(userName string) [][]interface{} {
 			total = total + Engagement[i]
 			i++
 		}
+		fmt.Println("Follower Count is :" + strconv.Itoa(Followers))
+		if Followers == 0 {
+			return nil
+		}
 		avgEngagement := float64(total) / (9 * float64(Followers))
 		BestEngagement := (float64(TotalLikes) + float64(TotalComments)) / (12 * float64(Followers))
 
