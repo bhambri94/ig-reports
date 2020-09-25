@@ -29,7 +29,7 @@ func main() {
 	defer logger.Sync()
 
 	router := fasthttprouter.New()
-	router.GET("/v1/get/ig/report/username=:USERNAME/SessionID:=SessionID", handleSaveIGReportToSheetsNew)
+	router.GET("/v1/get/ig/report/username=:USERNAME/SessionID=:SessionID", handleSaveIGReportToSheetsNew)
 	router.GET("/v1/get/ig/research/username=:USERNAME/LatestFollowerCount=:LatestFollowerCount/MinFollower=:MinFollower/MaxFollower=:MaxFollower/MinN=:MinN/MinNStar=:MinNStar/SessionID=:SessionID", handleSaveIGResearchToSheets)
 	log.Fatal(fasthttp.ListenAndServe(":3003", router.Handler))
 }
