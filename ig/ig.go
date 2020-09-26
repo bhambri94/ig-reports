@@ -21,7 +21,10 @@ func GetReportNew(userName string, SessionID string) [][]interface{} {
 	NumberOfPosts30Days := 0
 	NumberOfPosts90Days := 0
 	NumberOfPosts180Days := 0
-	UserId, _ := GetUserIDAndFollowerFromCodeNinja(userName)
+	if SessionID == "" {
+		SessionID = configs.Configurations.SessionId
+	}
+	UserId, _ := GetUserIDAndFollower(userName, SessionID)
 	Url := "https://www.instagram.com/graphql/query/?query_hash=bfa387b2992c3a52dcbe447467b4b771&variables=%7B%22id%22%3A%22" + UserId + "%22%2C%22first%22%3A12%7D"
 	fmt.Println(Url)
 	resp, err := soup.Get(Url)
@@ -104,7 +107,7 @@ func GetReportNew(userName string, SessionID string) [][]interface{} {
 		BestEngagement := (float64(TotalLikes) + float64(TotalComments)) / (12 * float64(Followers))
 
 		MediaTimestamp := t - 1
-		Days := 180
+		Days := 90
 		i = 0
 		for t-MediaTimestamp < (Days * 24 * 60 * 60) {
 			if EndCursor != "" || len(EndCursor) > 0 {
@@ -143,7 +146,7 @@ func GetReportNew(userName string, SessionID string) [][]interface{} {
 		}
 		row = append(row, float64(NumberOfPosts30Days)/4)
 		row = append(row, float64(NumberOfPosts90Days)/12)
-		row = append(row, float64(NumberOfPosts180Days)/24)
+		row = append(row, "NA")
 		row = append(row, BestEngagement)
 		row = append(row, avgEngagement)
 		row = append(row, (avgEngagement - BestEngagement))
@@ -347,20 +350,56 @@ type InstaID struct {
 	Biography     string `json:"biography"`
 }
 
-func GetUserIDAndFollower(userName string) (string, int) {
-	req, err := http.NewRequest("GET", "https://commentpicker.com/actions/instagram-id-action.php?username="+userName+"&token=29dd11e760c54402744ef2c3273ea2e3c901f88fb4ae749b4882856568ece7b0", nil)
+func GetUserIDAndFollower(userName string, SessionID string) (string, int) {
+	// req, err := http.NewRequest("GET", "https://commentpicker.com/actions/instagram-id-action.php?username="+userName+"&token=29dd11e760c54402744ef2c3273ea2e3c901f88fb4ae749b4882856568ece7b0", nil)
+	// if err != nil {
+	// 	// handle err
+	// }
+	// req.Header.Set("Authority", "commentpicker.com")
+	// req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36")
+	// req.Header.Set("Accept", "*/*")
+	// req.Header.Set("Sec-Fetch-Site", "same-origin")
+	// req.Header.Set("Sec-Fetch-Mode", "cors")
+	// req.Header.Set("Sec-Fetch-Dest", "empty")
+	// req.Header.Set("Referer", "https://commentpicker.com/instagram-user-id.php")
+	// req.Header.Set("Accept-Language", "en-GB,en-US;q=0.9,en;q=0.8")
+	// // req.Header.Set("Cookie", "ezoadgid_186623=-1; ezoref_186623=google.com; ezoab_186623=mod1; ezopvc_186623=1; ezepvv=333; lp_186623=https://commentpicker.com/instagram-user-id.php; ezovid_186623=1668751742; ezovuuid_186623=f0670d60-846a-4a4f-58c9-761391c8c345; ezCMPCCS=true; _ga=GA1.2.1779998933.1599997405; _gid=GA1.2.1575635277.1599997405; _gat=1; ezds=ffid%3D1%2Cw%3D1680%2Ch%3D1050; ezohw=w%3D1680%2Ch%3D916; __utma=131166109.1779998933.1599997405.1599997405.1599997405.1; __utmc=131166109; __utmz=131166109.1599997405.1.1.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not%20provided); __utmt_e=1; __utmt_f=1; __utmb=131166109.2.10.1599997405; ezosuigeneris=b728907b403c347d808888c8ecb1b4a9; cto_bidid=6B9wUV9GSURmQUg3bjNub3l3ZXJ2d0tGa21DVllReEZWaXduJTJGcTRsTlNhcHY3JTJGYXA1Y0lKRXBjWTA3MGZMTSUyQkRrV3Z1YllKOVFocmpDRXlSa0pCY01GeU52Z0dFT3NWYW9IYW9RRngxT2dPVERXTSUzRA; cto_bundle=reOv2F9YZ0J6OXg3cWIyS280QXhXMm9ldyUyRm5VbTA1VFpucEFmNSUyRndvUnRsa1pJaUhZS3N5UlFMVThMbiUyRjZNamt4aVM3Y2dVWHpkczRTTGRSWHVWUUljR2w4SVNNandXZzlVQkFJb1Z5SzU3SmZidXBUamJxMElBWTFVZkE5MFUlMkZnN0UwN0lsNHdDWDclMkJkMWZScWVkYWtUeXRnJTNEJTNE; ezux_lpl_186623=1599997405287|2abf5736-322c-4f4c-71cf-a1c27141c03b|false; ezouspvh=180; __gads=ID=4e92f1d7d26e48fb:T=1599997405:S=ALNI_MbRSd0jOFWnARwEXRaByNHhmtr3kQ; ezouspvv=496; ezouspva=8; __qca=P0-1035202418-1599997410395; ezux_et_186623=13; ezux_tos_186623=14; ezux_ifep_186623=true; ezoawesome_186623=commentpicker_com-medrectangle-2/2020-09-13/555335 1599997422248; active_template::186623=pub_site.1599997422; ezosuigenerisc=44e8e79940ca45b4801e7fdfd413e2d4")
+
+	// resp, err := http.DefaultClient.Do(req)
+	// if err != nil {
+	// 	// handle err
+	// 	return "", 0
+	// }
+	// defer resp.Body.Close()
+	// body, err := ioutil.ReadAll(resp.Body)
+	// fmt.Println(string(body))
+	// var instaID InstaID
+	// json.Unmarshal(body, &instaID)
+	// return instaID.ID, instaID.Followers
+
+	// Url := "https://www.instagram.com/graphql/query/?query_hash=bfa387b2992c3a52dcbe447467b4b771&variables=%7B%22id%22%3A%22" + userName + "%22%2C%22first%22%3A12%7D"
+	// fmt.Println(Url)
+	// resp, err := soup.Get(Url)
+	// if err != nil {
+	// 	fmt.Println("username not found")
+	// }
+
+	Url := "http://www.instagram.com/" + userName + "/"
+	req, err := http.NewRequest("GET", Url, nil)
 	if err != nil {
 		// handle err
 	}
-	req.Header.Set("Authority", "commentpicker.com")
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36")
-	req.Header.Set("Accept", "*/*")
+	req.Header.Set("Authority", "www.instagram.com")
+	req.Header.Set("Cache-Control", "max-age=0")
+	req.Header.Set("Upgrade-Insecure-Requests", "1")
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Linux; Android 9; SM-A102U Build/PPR1.180610.011; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.136 Mobile Safari/537.36 Instagram 155.0.0.37.107 Android (28/9; 320dpi; 720x1468; samsung; SM-A102U; a10e; exynos7885; en_US; 239490550)")
+	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
 	req.Header.Set("Sec-Fetch-Site", "same-origin")
-	req.Header.Set("Sec-Fetch-Mode", "cors")
-	req.Header.Set("Sec-Fetch-Dest", "empty")
-	req.Header.Set("Referer", "https://commentpicker.com/instagram-user-id.php")
+	req.Header.Set("Sec-Fetch-Mode", "navigate")
+	req.Header.Set("Sec-Fetch-User", "?1")
+	req.Header.Set("Sec-Fetch-Dest", "document")
 	req.Header.Set("Accept-Language", "en-GB,en-US;q=0.9,en;q=0.8")
-	// req.Header.Set("Cookie", "ezoadgid_186623=-1; ezoref_186623=google.com; ezoab_186623=mod1; ezopvc_186623=1; ezepvv=333; lp_186623=https://commentpicker.com/instagram-user-id.php; ezovid_186623=1668751742; ezovuuid_186623=f0670d60-846a-4a4f-58c9-761391c8c345; ezCMPCCS=true; _ga=GA1.2.1779998933.1599997405; _gid=GA1.2.1575635277.1599997405; _gat=1; ezds=ffid%3D1%2Cw%3D1680%2Ch%3D1050; ezohw=w%3D1680%2Ch%3D916; __utma=131166109.1779998933.1599997405.1599997405.1599997405.1; __utmc=131166109; __utmz=131166109.1599997405.1.1.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not%20provided); __utmt_e=1; __utmt_f=1; __utmb=131166109.2.10.1599997405; ezosuigeneris=b728907b403c347d808888c8ecb1b4a9; cto_bidid=6B9wUV9GSURmQUg3bjNub3l3ZXJ2d0tGa21DVllReEZWaXduJTJGcTRsTlNhcHY3JTJGYXA1Y0lKRXBjWTA3MGZMTSUyQkRrV3Z1YllKOVFocmpDRXlSa0pCY01GeU52Z0dFT3NWYW9IYW9RRngxT2dPVERXTSUzRA; cto_bundle=reOv2F9YZ0J6OXg3cWIyS280QXhXMm9ldyUyRm5VbTA1VFpucEFmNSUyRndvUnRsa1pJaUhZS3N5UlFMVThMbiUyRjZNamt4aVM3Y2dVWHpkczRTTGRSWHVWUUljR2w4SVNNandXZzlVQkFJb1Z5SzU3SmZidXBUamJxMElBWTFVZkE5MFUlMkZnN0UwN0lsNHdDWDclMkJkMWZScWVkYWtUeXRnJTNEJTNE; ezux_lpl_186623=1599997405287|2abf5736-322c-4f4c-71cf-a1c27141c03b|false; ezouspvh=180; __gads=ID=4e92f1d7d26e48fb:T=1599997405:S=ALNI_MbRSd0jOFWnARwEXRaByNHhmtr3kQ; ezouspvv=496; ezouspva=8; __qca=P0-1035202418-1599997410395; ezux_et_186623=13; ezux_tos_186623=14; ezux_ifep_186623=true; ezoawesome_186623=commentpicker_com-medrectangle-2/2020-09-13/555335 1599997422248; active_template::186623=pub_site.1599997422; ezosuigenerisc=44e8e79940ca45b4801e7fdfd413e2d4")
+	req.Header.Add("Cookie", "sessionid="+SessionID)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -369,78 +408,41 @@ func GetUserIDAndFollower(userName string) (string, int) {
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(body))
-	var instaID InstaID
-	json.Unmarshal(body, &instaID)
-	return instaID.ID, instaID.Followers
-
-	// Url := "https://www.instagram.com/graphql/query/?query_hash=bfa387b2992c3a52dcbe447467b4b771&variables=%7B%22id%22%3A%22" + userName + "%22%2C%22first%22%3A12%7D"
-	// fmt.Println(Url)
-	// resp, err := soup.Get(Url)
-	// if err != nil {
-	// 	fmt.Println("username not found")
-	// }
-	// Url := "http://www.instagram.com/" + userName + "/"
-	// req, err := http.NewRequest("GET", Url, nil)
-	// if err != nil {
-	// 	// handle err
-	// }
-	// req.Header.Set("Authority", "www.instagram.com")
-	// req.Header.Set("Cache-Control", "max-age=0")
-	// req.Header.Set("Upgrade-Insecure-Requests", "1")
-	// req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36")
-	// req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
-	// req.Header.Set("Sec-Fetch-Site", "same-origin")
-	// req.Header.Set("Sec-Fetch-Mode", "navigate")
-	// req.Header.Set("Sec-Fetch-User", "?1")
-	// req.Header.Set("Sec-Fetch-Dest", "document")
-	// req.Header.Set("Accept-Language", "en-GB,en-US;q=0.9,en;q=0.8")
-	// req.Header.Set("Cookie", "mid=XSMB8QAEAAEs3mQemNZLh2dhx98f; ig_did=EBB71BE2-8122-414C-9E28-4946DF598A00; datr=mgUcXzN0FK6UZc2wKHzFVdS8; fbm_124024574287414=base_domain=.instagram.com; shbid=18143; shbts=1599896664.3834596; rur=ATN; fbsr_124024574287414=Gx2jo4u1YNucR8uhdoS_OZz11ssN3ZH1Hm99OsmpsrE.eyJ1c2VyX2lkIjoiMTAwMDAyMDg2MzA5OTAzIiwiY29kZSI6IkFRREFOUlJ5VUtRN3BwaENSY1BGOVNLM3hvb1hVb2Q2UFBDMkJpaGtuUkVnd3BPQTZuc1dSVHdUbzNQUldxdjFnZi1nM0EwMlhDY01rZE9qQ1lzMzB1Z19KanZVUENVc2d5YzhFcml2cUNGU3pmOERaUUpRSXVFc2NxTGNNeWw0WlU2dURidHdZekRQWFJHQUhnQ0g0bkNvb3R0NnZyUWFkdGJ0SWV0d3BwcnZNc2hTbUJidmNab2tndkVxd3h1N3Jyd3FrU2F0OGdiT0xYWG1rV3p1T2QzT2tLUVRVdlBXc2xWOHpRellwal9sbjMzVjZPb0tFNmZMNm9TVnhNZk0wdU1aanprWDFPZ0IweFlmYU1PcHJGMW9qcUFmakJUMGJGUVl2LWVuZlNYeHIyS29uVS1LTzJrdl96TU9jVVNhTm5KeDJLVDN6NTcyMUhxenIxMlUtZDBRIiwib2F1dGhfdG9rZW4iOiJFQUFCd3pMaXhuallCQU0xbXMxQXJMMXQ2cU5rWGw5RTFnOXYyWkFyUHRyVk9wMHVFZmhHY05HMTJOaFpCZUhRNlFWalI5em1OcU85RU1Bc2pWOE85N2FXcVpCM2tQdkRaQncyb0gyelNrd3Azc0xRMXVMZ2p0OXlLOXE1WkN6QlBXaTRqdTl5bmtvT201NHB1d0s5MTFFSHdvSGgwZlZIWkNaQXkzSXdRa3hrT2NpbkRYZ0RzVzBaQiIsImFsZ29yaXRobSI6IkhNQUMtU0hBMjU2IiwiaXNzdWVkX2F0IjoxNTk5OTEwMzQwfQ; csrftoken=AYPfDg0kdLFbPNZbVHkkJIojQ1wPKSdH; ds_user_id=41309535897; sessionid=41309535897%3A4XfannYCtGdfzr%3A29;")
-
-	// resp, err := http.DefaultClient.Do(req)
-	// if err != nil {
-	// 	// handle err
-	// }
-	// defer resp.Body.Close()
-	// body, err := ioutil.ReadAll(resp.Body)
-	// if err != nil {
-	// 	fmt.Println("Error")
-	// 	return ""
-	// } else {
-	// 	actual := strings.Index(string(body), "<script type=\"text/javascript\">window._sharedData")
-	// 	if actual == -1 {
-	// 		return ""
-	// 	}
-	// 	end := strings.Index(string(body), "<script type=\"text/javascript\">window.__initialDataLoaded(window._sharedData);</script>")
-	// 	if end == -1 {
-	// 		return ""
-	// 	}
-	// 	filteredString := (string(body)[actual+len("<script type=\"text/javascript\">window._sharedData")+2 : end-11])
-	// 	if filteredString == "" {
-	// 		return ""
-	// 	}
-	// 	var igResponse IGResponse
-	// 	json.Unmarshal([]byte(filteredString), &igResponse)
-	// 	if len(igResponse.EntryData.ProfilePage) > 0 {
-	// 		return igResponse.EntryData.ProfilePage[0].Graphql.User.ID
-	// 	}
-	// }
-	// var igResponse IGResponse
-	// json.Unmarshal([]byte(string(resp)), &igResponse)
-	// if len(igResponse.EntryData.ProfilePage) > 0 {
-	// 	return igResponse.EntryData.ProfilePage[0].Graphql.User.ID
-	// }
-	// return ""
+	if err != nil {
+		fmt.Println("Error")
+		return "", 0
+	} else {
+		actual := strings.Index(string(body), "<script type=\"text/javascript\">window._sharedData")
+		if actual == -1 {
+			return "", 0
+		}
+		end := strings.Index(string(body), "<script type=\"text/javascript\">window.__initialDataLoaded(window._sharedData);</script>")
+		if end == -1 {
+			return "", 0
+		}
+		filteredString := (string(body)[actual+len("<script type=\"text/javascript\">window._sharedData")+2 : end-11])
+		if filteredString == "" {
+			return "", 0
+		}
+		var igResponse IGResponse
+		json.Unmarshal([]byte(filteredString), &igResponse)
+		if len(igResponse.EntryData.ProfilePage) > 0 {
+			return igResponse.EntryData.ProfilePage[0].Graphql.User.ID, igResponse.EntryData.ProfilePage[0].Graphql.User.EdgeFollowedBy.Count
+		}
+	}
+	return "", 0
 }
 
 func GetFollowers(userName string, MaxFollowers string, SessionID string) []string {
 	MaxFollowersInt, err := strconv.Atoi(MaxFollowers)
-	// MaxFollowersInt--
 	if err != nil {
 		MaxFollowersInt = 500
 	}
 	MaxFollowersCount := 0
-	UserID, _ := GetUserIDAndFollowerFromCodeNinja(userName)
+	if SessionID == "" {
+		SessionID = configs.Configurations.SessionId
+	}
+	UserID, _ := GetUserIDAndFollower(userName, SessionID)
 	fmt.Println("*****")
 	fmt.Println("User Id found: " + UserID)
 	fmt.Println("*****")
