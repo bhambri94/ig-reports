@@ -269,9 +269,20 @@ func handleSaveIGReportToSheetsNew(ctx *fasthttp.RequestCtx) {
 	if SessionID == nil {
 		SessionID = ""
 	}
+
 	finalValues := ig.GetReportNew(userName.(string), SessionID.(string))
+	LatestIGRAtRow := 3
+	currentValueInSheets := googleSheets.BatchGet(configs.Configurations.SheetNameWithRange + "!A1:L50000")
+	if len(currentValueInSheets) > 0 {
+		LatestIGRAtRow = len(currentValueInSheets) + 1
+	}
+	fmt.Println(LatestIGRAtRow)
 	if len(finalValues) > 0 {
-		googleSheets.BatchAppend(configs.Configurations.SheetNameWithRange, finalValues)
+		if LatestIGRAtRow == 3 {
+			googleSheets.BatchAppend(configs.Configurations.SheetNameWithRange, finalValues)
+		} else {
+			googleSheets.BatchWrite(configs.Configurations.SheetNameWithRange+"!A"+strconv.Itoa(LatestIGRAtRow)+":L"+strconv.Itoa(LatestIGRAtRow), finalValues)
+		}
 		ctx.Response.Header.Set("Content-Type", "application/json")
 		ctx.Response.SetStatusCode(200)
 		ctx.SetBody([]byte("Success Google Sheet Updated"))
