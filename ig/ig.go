@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math"
+	"math/rand"
 	"net/http"
 	"os"
 	"sort"
@@ -16,7 +17,7 @@ import (
 	"github.com/bhambri94/ig-reports/configs"
 )
 
-func GetReportNew(userName string, SessionID string) [][]interface{} {
+func GetReportNew(userName string, SessionID string) ([][]interface{}, string) {
 	var finalValues [][]interface{}
 	NumberOfPosts30Days := 0
 	NumberOfPosts90Days := 0
@@ -24,7 +25,7 @@ func GetReportNew(userName string, SessionID string) [][]interface{} {
 	if SessionID == "" {
 		SessionID = configs.Configurations.SessionId
 	}
-	UserId, _ := GetUserIDAndFollower(userName, SessionID)
+	UserId, _, CookieErrorString := GetUserIDAndFollower(userName, GetRandomCookie(SessionID))
 	Url := "https://www.instagram.com/graphql/query/?query_hash=bfa387b2992c3a52dcbe447467b4b771&variables=%7B%22id%22%3A%22" + UserId + "%22%2C%22first%22%3A12%7D"
 	fmt.Println(Url)
 	resp, err := soup.Get(Url)
@@ -43,6 +44,8 @@ func GetReportNew(userName string, SessionID string) [][]interface{} {
 	var row []interface{}
 	TotalLikes := 0.0
 	TotalComments := 0.0
+	NumberOfPostsOnFirstPage := 12
+	FirstPage := true
 	if len(igResponse.Data.User.EdgeOwnerToTimelineMedia.Edges) > 0 {
 		FollowerURL := "https://www.instagram.com/graphql/query/?query_hash=c76146de99bb02f6415203be841dd25a&variables=%7B%22id%22%3A%22" + UserId + "%22%2C%22include_reel%22%3Afalse%2C%22fetch_mutual%22%3Afalse%2C%22first%22%3A24%7D"
 		fmt.Println(FollowerURL)
@@ -56,7 +59,8 @@ func GetReportNew(userName string, SessionID string) [][]interface{} {
 		if SessionID == "" {
 			SessionID = configs.Configurations.SessionId
 		}
-		req.Header.Add("Cookie", "sessionid="+SessionID)
+		Cookie := GetRandomCookie(SessionID)
+		req.Header.Add("Cookie", "sessionid="+Cookie)
 		//		req.Header.Add("Cookie", "ig_did=2E8DBEA9-6BAB-4214-BE14-3E92C1956C79; mid=X2Cs0AAEAAH4q10wWRKpkOR7Vcxk; csrftoken=85768r6cbvT6MHcJ7JXRjAz30M7ZyWWP; ds_user_id=41670979469; sessionid=41670979469%3AXIijRyjzHto0c7%3A26; rur=PRN;")
 		res, err := client.Do(req)
 		if err != nil {
@@ -77,7 +81,10 @@ func GetReportNew(userName string, SessionID string) [][]interface{} {
 		row = append(row, Followers)
 		// row = append(row, "NA")
 		row = append(row, igResponse.Data.User.EdgeOwnerToTimelineMedia.Count)
-
+		if FirstPage {
+			NumberOfPostsOnFirstPage = len(igResponse.Data.User.EdgeOwnerToTimelineMedia.Edges)
+			FirstPage = false
+		}
 		i := 0
 		Engagement := make([]int, 12)
 		for i < 12 && i < len(igResponse.Data.User.EdgeOwnerToTimelineMedia.Edges) {
@@ -101,10 +108,10 @@ func GetReportNew(userName string, SessionID string) [][]interface{} {
 		}
 		fmt.Println("Follower Count is :" + strconv.Itoa(Followers))
 		if Followers == 0 {
-			return nil
+			return nil, CookieErrorString
 		}
 		avgEngagement := float64(total) / (9 * float64(Followers))
-		BestEngagement := (float64(TotalLikes) + float64(TotalComments)) / (12 * float64(Followers))
+		BestEngagement := (float64(TotalLikes) + float64(TotalComments)) / (float64(NumberOfPostsOnFirstPage) * float64(Followers))
 
 		MediaTimestamp := t - 1
 		Days := 90
@@ -150,11 +157,11 @@ func GetReportNew(userName string, SessionID string) [][]interface{} {
 		row = append(row, BestEngagement)
 		row = append(row, avgEngagement)
 		row = append(row, (avgEngagement - BestEngagement))
-		row = append(row, TotalComments/12)
-		row = append(row, (BestEngagement)-(TotalLikes/(12*float64(Followers))))
+		row = append(row, TotalComments/float64(NumberOfPostsOnFirstPage))
+		row = append(row, (BestEngagement)-(TotalLikes/(float64(NumberOfPostsOnFirstPage)*float64(Followers))))
 		finalValues = append(finalValues, row)
 	}
-	return finalValues
+	return finalValues, CookieErrorString
 }
 
 func GetReport(userName string) [][]interface{} {
@@ -350,7 +357,7 @@ type InstaID struct {
 	Biography     string `json:"biography"`
 }
 
-func GetUserIDAndFollower(userName string, SessionID string) (string, int) {
+func GetUserIDAndFollower(userName string, SessionID string) (string, int, string) {
 	// req, err := http.NewRequest("GET", "https://commentpicker.com/actions/instagram-id-action.php?username="+userName+"&token=29dd11e760c54402744ef2c3273ea2e3c901f88fb4ae749b4882856568ece7b0", nil)
 	// if err != nil {
 	// 	// handle err
@@ -404,36 +411,36 @@ func GetUserIDAndFollower(userName string, SessionID string) (string, int) {
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		// handle err
-		return "", 0
+		return "", 0, "Issue with Cookie:" + SessionID
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("Error")
-		return "", 0
+		return "", 0, "Issue with Cookie:" + SessionID
 	} else {
 		actual := strings.Index(string(body), "<script type=\"text/javascript\">window._sharedData")
 		if actual == -1 {
-			return "", 0
+			return "", 0, "Issue with Cookie:" + SessionID
 		}
 		end := strings.Index(string(body), "<script type=\"text/javascript\">window.__initialDataLoaded(window._sharedData);</script>")
 		if end == -1 {
-			return "", 0
+			return "", 0, "Issue with Cookie:" + SessionID
 		}
 		filteredString := (string(body)[actual+len("<script type=\"text/javascript\">window._sharedData")+2 : end-11])
 		if filteredString == "" {
-			return "", 0
+			return "", 0, "Issue with Cookie:" + SessionID
 		}
 		var igResponse IGResponse
 		json.Unmarshal([]byte(filteredString), &igResponse)
 		if len(igResponse.EntryData.ProfilePage) > 0 {
-			return igResponse.EntryData.ProfilePage[0].Graphql.User.ID, igResponse.EntryData.ProfilePage[0].Graphql.User.EdgeFollowedBy.Count
+			return igResponse.EntryData.ProfilePage[0].Graphql.User.ID, igResponse.EntryData.ProfilePage[0].Graphql.User.EdgeFollowedBy.Count, ""
 		}
 	}
-	return "", 0
+	return "", 0, "Issue with Cookie:" + SessionID
 }
 
-func GetFollowers(userName string, MaxFollowers string, SessionID string) []string {
+func GetFollowers(userName string, MaxFollowers string, SessionID string) ([]string, string) {
 	MaxFollowersInt, err := strconv.Atoi(MaxFollowers)
 	if err != nil {
 		MaxFollowersInt = 500
@@ -442,12 +449,12 @@ func GetFollowers(userName string, MaxFollowers string, SessionID string) []stri
 	if SessionID == "" {
 		SessionID = configs.Configurations.SessionId
 	}
-	UserID, _ := GetUserIDAndFollower(userName, SessionID)
+	UserID, _, CookieErrorString := GetUserIDAndFollower(userName, GetRandomCookie(SessionID))
 	fmt.Println("*****")
 	fmt.Println("User Id found: " + UserID)
 	fmt.Println("*****")
 	if UserID == "" {
-		return nil
+		return nil, CookieErrorString
 	}
 	var finalValues []string
 	var igFollowersResearch IGFollowersResearch
@@ -474,7 +481,7 @@ func GetFollowers(userName string, MaxFollowers string, SessionID string) []stri
 			SessionID = configs.Configurations.SessionId
 		}
 		req.Header.Add("accept", " */*")
-		req.Header.Add("Cookie", "sessionid="+SessionID)
+		req.Header.Add("Cookie", "sessionid="+GetRandomCookie(SessionID))
 
 		// req.Header.Add("cookie", "mid=XSMB8QAEAAEs3mQemNZLh2dhx98f; ig_did=EBB71BE2-8122-414C-9E28-4946DF598A00; datr=mgUcXzN0FK6UZc2wKHzFVdS8; fbm_124024574287414=base_domain=.instagram.com; shbid=18143; shbts=1599896664.3834596; rur=ATN; fbsr_124024574287414=gO0ZKWcK57Alnu3dYwqdbq0dRLKS9Dkj6l1TY1m4HoU.eyJ1c2VyX2lkIjoiMTAwMDAyMDg2MzA5OTAzIiwiY29kZSI6IkFRQ3ZUSlVvTkFxM2Nqbzc2TGZta3lGa3pFel9Td0pjS2hpOVFBSTBNaUs3aUdzTXYyWUU1Tkp3MGkyN0Z1UFU2N2pCM2wtVVRubjdlMkhkQTVaZ1ZWQjZZWDVuVGNvNE5HQ3VHZklJczZwTW1sdkh2ZXVnY1V6ZHZGajZqWW1TMUlvX2lMdDB1c3V2emg3U2ZNUkxCY3FMeEhVTnVQS3pIZkc2VTJ1bHhRV1EwQVVVYkNOVkduQ0dVQy1jUlZWRFVEMGVUckxEb0VNSDBTNGtKODk0bk9Valh0WnhMOEVsTWxGTmdZVHhVZmtRUUEwcnhfNnRfUlltdlJTVnZzb2hzRE1WVVNfOXVrbE9Rc1djM0JEdm5PeFR4WDhBaXhkMERsN25zOW9SeFNmczRWeU1vNldTYWFkWTBhaElpSHVRNjh2Z0dqQ2xfNmlxNEZmVmNlb2M1Mk81Iiwib2F1dGhfdG9rZW4iOiJFQUFCd3pMaXhuallCQUIxY252YVNqUmtuY3kxeUNEUnM2cTVBWkF3N0ozYWRlaWRhSHlLVkxwY1pBUzRScHBmT3lPR1F1Nm03SEtwOUJCRzZQcFhkdjhaQ3BWd1pBT0ZaQWxXU0p5WGdSOFkxTExDT0prS2NYbjhpT1l1MDUzc2lPcHJja3U4SXd3YWdVb1pCcmFraldQTzlaQzhIUHNqMkZMZFZJMEF6TWNzQ1haQjlucG5jNFk5byIsImFsZ29yaXRobSI6IkhNQUMtU0hBMjU2IiwiaXNzdWVkX2F0IjoxNTk5OTAwMjIxfQ; csrftoken=CZVniHggvmGG9S2FIUlnTmzzACw0hWAF; sessionid=1270182093%3AEP9oNwncijl685%3A8;")
 
@@ -502,7 +509,7 @@ func GetFollowers(userName string, MaxFollowers string, SessionID string) []stri
 		EndCursor = igFollowersResearch.Data.User.EdgeFollow.PageInfo.EndCursor
 		NextPage = igFollowersResearch.Data.User.EdgeFollow.PageInfo.HasNextPage
 	}
-	return finalValues
+	return finalValues, ""
 }
 
 func GetIGReport(userNames []string, SearchQuery map[string]int) [][]interface{} {
@@ -614,14 +621,15 @@ func GetIGReport(userNames []string, SearchQuery map[string]int) [][]interface{}
 	return finalValues
 }
 
-func GetIGReportNew(userNames []string, SearchQuery map[string]int, SessionID string) ([][]interface{}, bool) {
+func GetIGReportNew(userNames []string, SearchQuery map[string]int, SessionID string, NDelta float64) ([][]interface{}, bool, string) {
 	var finalValues [][]interface{}
 	parentIterator := 0
 	NoOneSucceeded := 0
+	var CookieErrorString string
 	for parentIterator < len(userNames) {
 		var row []interface{}
 		time.Sleep(1000 * time.Millisecond)
-		UserId, _ := GetUserIDAndFollowerFromCodeNinja(userNames[parentIterator])
+		UserId, _, CookieErrorString := GetUserIDAndFollower(userNames[parentIterator], GetRandomCookie(SessionID))
 		Url := "https://www.instagram.com/graphql/query/?query_hash=bfa387b2992c3a52dcbe447467b4b771&variables=%7B%22id%22%3A%22" + UserId + "%22%2C%22first%22%3A12%7D"
 		fmt.Println(Url)
 		method := "GET"
@@ -657,7 +665,10 @@ func GetIGReportNew(userNames []string, SearchQuery map[string]int, SessionID st
 			if SessionID == "" {
 				SessionID = configs.Configurations.SessionId
 			}
-			req.Header.Add("Cookie", "sessionid="+SessionID)
+			Cookie := GetRandomCookie(SessionID)
+			fmt.Println(CookieErrorString)
+			fmt.Println(SessionID)
+			req.Header.Add("Cookie", "sessionid="+Cookie)
 			//			req.Header.Add("Cookie", "ig_did=2E8DBEA9-6BAB-4214-BE14-3E92C1956C79; mid=X2Cs0AAEAAH4q10wWRKpkOR7Vcxk; csrftoken=85768r6cbvT6MHcJ7JXRjAz30M7ZyWWP; ds_user_id=41670979469; sessionid=41670979469%3AXIijRyjzHto0c7%3A26; rur=PRN;")
 			res, err := client.Do(req)
 			if err != nil {
@@ -686,6 +697,7 @@ func GetIGReportNew(userNames []string, SearchQuery map[string]int, SessionID st
 					continue
 				}
 			}
+
 			i := 0
 			Engagement := make([]int, 12)
 			for i < 12 && i < len(igResponse.Data.User.EdgeOwnerToTimelineMedia.Edges) {
@@ -703,10 +715,10 @@ func GetIGReportNew(userNames []string, SearchQuery map[string]int, SessionID st
 				total = total + Engagement[i]
 				i++
 			}
-			BestEngagement := float64(total) / (9 * float64(Followers))
-			BestEngagement = BestEngagement * 100
-			avgEngagement := (float64(TotalLikes) + float64(TotalComments)) / (12 * float64(Followers))
-			avgEngagement = avgEngagement * 100
+			BestEngagementFloat := float64(total) / (9 * float64(Followers))
+			BestEngagement := BestEngagementFloat * 100
+			avgEngagementFloat := (float64(TotalLikes) + float64(TotalComments)) / (12 * float64(Followers))
+			avgEngagement := avgEngagementFloat * 100
 			fmt.Println(float64(Followers))
 			fmt.Println(BestEngagement)
 			fmt.Println(avgEngagement)
@@ -726,7 +738,14 @@ func GetIGReportNew(userNames []string, SearchQuery map[string]int, SessionID st
 					continue
 				}
 			}
-			row = append(row, userNames[parentIterator])
+			if NDelta > 0.0 {
+				if BestEngagement-avgEngagement < NDelta {
+					parentIterator++
+					NoOneSucceeded++
+					continue
+				}
+			}
+			row = append(row, userNames[parentIterator], "https://www.instagram.com/"+userNames[parentIterator], "", Followers, avgEngagementFloat, BestEngagementFloat, BestEngagementFloat-avgEngagementFloat)
 		}
 		finalValues = append(finalValues, row)
 		parentIterator++
@@ -737,7 +756,20 @@ func GetIGReportNew(userNames []string, SearchQuery map[string]int, SessionID st
 		NoOneSucceededBoolean = true
 	}
 
-	return finalValues, NoOneSucceededBoolean
+	return finalValues, NoOneSucceededBoolean, CookieErrorString
+}
+
+func GetRandomCookie(SessionID string) string {
+	IndividualCookie := strings.Split(SessionID, ",")
+	Index := 0
+	if len(IndividualCookie) > 1 {
+		x1 := rand.NewSource(time.Now().UnixNano())
+		y1 := rand.New(x1)
+		Index = y1.Intn(len(IndividualCookie))
+	} else {
+		return SessionID
+	}
+	return IndividualCookie[Index]
 }
 
 type AutoGenerated struct {

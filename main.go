@@ -30,7 +30,7 @@ func main() {
 
 	router := fasthttprouter.New()
 	router.GET("/v1/get/ig/report/username=:USERNAME/SessionID=:SessionID", handleSaveIGReportToSheetsNew)
-	router.GET("/v1/get/ig/research/username=:USERNAME/LatestFollowerCount=:LatestFollowerCount/MinFollower=:MinFollower/MaxFollower=:MaxFollower/MinN=:MinN/MinNStar=:MinNStar/SessionID=:SessionID", handleSaveIGResearchToSheets)
+	router.GET("/v1/get/ig/research/username=:USERNAME/LatestFollowerCount=:LatestFollowerCount/MinFollower=:MinFollower/MaxFollower=:MaxFollower/MinN=:MinN/MinNStar=:MinNStar/NDelta=:NDelta/SessionID=:SessionID", handleSaveIGResearchToSheets)
 	log.Fatal(fasthttp.ListenAndServe(":3003", router.Handler))
 }
 
@@ -55,6 +55,7 @@ func handleSaveIGResearchToSheets(ctx *fasthttp.RequestCtx) {
 	MinN := ctx.UserValue("MinN")
 	MinNStar := ctx.UserValue("MinNStar")
 	SessionID := ctx.UserValue("SessionID")
+	NDelta := ctx.UserValue("NDelta")
 	if SessionID != nil {
 		temp := SessionID.(string)
 		temp = temp[1 : len(temp)-1]
@@ -66,8 +67,9 @@ func handleSaveIGResearchToSheets(ctx *fasthttp.RequestCtx) {
 	fmt.Println(MaxFollower)
 	fmt.Println(MinN)
 	fmt.Println(MinNStar)
+	fmt.Println(NDelta)
 	fmt.Println(SessionID)
-	FollowersList := ig.GetFollowers(userName.(string), LatestFollowerCount.(string)[1:len(LatestFollowerCount.(string))-1], SessionID.(string))
+	FollowersList, CookieErrorString1 := ig.GetFollowers(userName.(string), LatestFollowerCount.(string)[1:len(LatestFollowerCount.(string))-1], SessionID.(string))
 	SearchQuery := make(map[string]int)
 	if MinFollower != nil {
 		temp := MinFollower.(string)
@@ -101,7 +103,16 @@ func handleSaveIGResearchToSheets(ctx *fasthttp.RequestCtx) {
 			SearchQuery["MinNStar"] = tempInt
 		}
 	}
-	finalValues, NoOneSucceededBoolean := ig.GetIGReportNew(FollowersList, SearchQuery, SessionID.(string))
+	NDeltaFloat := 0.0
+	if NDelta != nil {
+		temp := NDelta.(string)
+		temp = temp[1 : len(temp)-1]
+		tempFloat, e := strconv.ParseFloat(temp, 2)
+		if e == nil {
+			NDeltaFloat = tempFloat
+		}
+	}
+	finalValues, NoOneSucceededBoolean, CookieErrorString2 := ig.GetIGReportNew(FollowersList, SearchQuery, SessionID.(string), NDeltaFloat)
 	fmt.Println("*********")
 	fmt.Println(finalValues)
 	if len(finalValues) > 0 {
@@ -110,18 +121,18 @@ func handleSaveIGResearchToSheets(ctx *fasthttp.RequestCtx) {
 		googleSheets.BatchWrite(configs.Configurations.ResearchJRSheetName, finalValues)
 		ctx.Response.Header.Set("Content-Type", "application/json")
 		ctx.Response.SetStatusCode(200)
-		ctx.SetBody([]byte("Success Google Sheet Updated"))
+		ctx.SetBody([]byte("Success Google Sheet Updated" + " -- " + CookieErrorString1 + " " + CookieErrorString2))
 		sugar.Infof("calling ig research reports success!")
 	} else if NoOneSucceededBoolean {
 		ctx.Response.Header.Set("Content-Type", "application/json")
 		ctx.Response.SetStatusCode(200)
 		ctx.SetBody([]byte("Noone passed the filter search query"))
-		sugar.Infof("calling ig research reports success!")
+		sugar.Infof("calling ig research reports success!" + " -- " + CookieErrorString1 + " " + CookieErrorString2)
 	} else {
 		ctx.Response.Header.Set("Content-Type", "application/json")
 		ctx.Response.SetStatusCode(200)
 		ctx.SetBody([]byte("Something went wrong, not able to fetch data"))
-		sugar.Infof("calling ig research reports failure!")
+		sugar.Infof("calling ig research reports failure!" + " -- " + CookieErrorString1 + " " + CookieErrorString2)
 	}
 }
 
@@ -266,11 +277,13 @@ func handleSaveIGReportToSheetsNew(ctx *fasthttp.RequestCtx) {
 		return
 	}
 	SessionID := ctx.UserValue("SessionID")
-	if SessionID == nil {
-		SessionID = ""
+	if SessionID != nil {
+		temp := SessionID.(string)
+		temp = temp[1 : len(temp)-1]
+		SessionID = temp
 	}
 
-	finalValues := ig.GetReportNew(userName.(string), SessionID.(string))
+	finalValues, CookieErrorString := ig.GetReportNew(userName.(string), SessionID.(string))
 	LatestIGRAtRow := 3
 	currentValueInSheets := googleSheets.BatchGet(configs.Configurations.SheetNameWithRange + "!A1:L50000")
 	if len(currentValueInSheets) > 0 {
@@ -285,12 +298,12 @@ func handleSaveIGReportToSheetsNew(ctx *fasthttp.RequestCtx) {
 		}
 		ctx.Response.Header.Set("Content-Type", "application/json")
 		ctx.Response.SetStatusCode(200)
-		ctx.SetBody([]byte("Success Google Sheet Updated"))
+		ctx.SetBody([]byte("Success Google Sheet Updated " + CookieErrorString))
 		sugar.Infof("calling ig reprts success!")
 	} else {
 		ctx.Response.Header.Set("Content-Type", "application/json")
 		ctx.Response.SetStatusCode(200)
-		ctx.SetBody([]byte("Something went wrong, not able to fetch data"))
+		ctx.SetBody([]byte("Something went wrong, not able to fetch data " + CookieErrorString))
 		sugar.Infof("calling ig reprts failure!")
 	}
 }
