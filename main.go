@@ -330,7 +330,7 @@ func handleIGRDatabaseBackup(ctx *fasthttp.RequestCtx) {
 		googleSheets.BatchAppend(configs.Configurations.IGRDatabaseSheetName, finalValuesToSheets)
 	}
 	if len(finalValuesToSheets) > 0 {
-		googleSheets.ClearSheet("IGR!A3:M50000")
+		googleSheets.ClearSheet("IGR!A4:M50000")
 		ctx.Response.Header.Set("Content-Type", "application/json")
 		ctx.Response.SetStatusCode(200)
 		ctx.SetBody([]byte("Success IGR Database Google Sheet Updated "))
