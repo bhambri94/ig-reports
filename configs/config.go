@@ -8,10 +8,11 @@ import (
 )
 
 type Configs struct {
-	SpreadsheetID       string `json:"SpreadsheetID"`
-	SheetNameWithRange  string `json:"SheetNameWithRange"`
-	ResearchJRSheetName string `json:"ResearchJRSheetName"`
-	SessionId           string `json:"SessionId"`
+	SpreadsheetID        string `json:"SpreadsheetID"`
+	SheetNameWithRange   string `json:"SheetNameWithRange"`
+	ResearchJRSheetName  string `json:"ResearchJRSheetName"`
+	SessionId            string `json:"SessionId"`
+	IGRDatabaseSheetName string `json:"IGRDatabaseSheetName"`
 }
 
 var (

@@ -30,7 +30,9 @@ func main() {
 
 	router := fasthttprouter.New()
 	router.GET("/v1/get/ig/report/username=:USERNAME/SessionID=:SessionID", handleSaveIGReportToSheetsNew)
+	router.GET("/v1/get/igr/database-backup", handleIGRDatabaseBackup)
 	router.GET("/v1/get/ig/research/username=:USERNAME/LatestFollowerCount=:LatestFollowerCount/MinFollower=:MinFollower/MaxFollower=:MaxFollower/MinN=:MinN/MinNStar=:MinNStar/NDelta=:NDelta/SessionID=:SessionID", handleSaveIGResearchToSheets)
+	router.GET("/v1/get/ig/nos/username=:USERNAME/LatestFollowerCount=:LatestFollowerCount/MinFollower=:MinFollower/MaxFollower=:MaxFollower/MinN=:MinN/MinNStar=:MinNStar/NDelta=:NDelta/SessionID=:SessionID", handleSaveIGResearchToSheets)
 	log.Fatal(fasthttp.ListenAndServe(":3003", router.Handler))
 }
 
@@ -285,7 +287,7 @@ func handleSaveIGReportToSheetsNew(ctx *fasthttp.RequestCtx) {
 
 	finalValues, CookieErrorString := ig.GetReportNew(userName.(string), SessionID.(string))
 	LatestIGRAtRow := 3
-	currentValueInSheets := googleSheets.BatchGet(configs.Configurations.SheetNameWithRange + "!A1:L50000")
+	currentValueInSheets := googleSheets.BatchGet(configs.Configurations.SheetNameWithRange + "!A1:M50000")
 	if len(currentValueInSheets) > 0 {
 		LatestIGRAtRow = len(currentValueInSheets) + 1
 	}
@@ -294,7 +296,7 @@ func handleSaveIGReportToSheetsNew(ctx *fasthttp.RequestCtx) {
 		if LatestIGRAtRow == 3 {
 			googleSheets.BatchAppend(configs.Configurations.SheetNameWithRange, finalValues)
 		} else {
-			googleSheets.BatchWrite(configs.Configurations.SheetNameWithRange+"!A"+strconv.Itoa(LatestIGRAtRow)+":L"+strconv.Itoa(LatestIGRAtRow), finalValues)
+			googleSheets.BatchWrite(configs.Configurations.SheetNameWithRange+"!A"+strconv.Itoa(LatestIGRAtRow)+":M"+strconv.Itoa(LatestIGRAtRow), finalValues)
 		}
 		ctx.Response.Header.Set("Content-Type", "application/json")
 		ctx.Response.SetStatusCode(200)
@@ -304,6 +306,39 @@ func handleSaveIGReportToSheetsNew(ctx *fasthttp.RequestCtx) {
 		ctx.Response.Header.Set("Content-Type", "application/json")
 		ctx.Response.SetStatusCode(200)
 		ctx.SetBody([]byte("Something went wrong, not able to fetch data " + CookieErrorString))
+		sugar.Infof("calling ig reprts failure!")
+	}
+}
+
+func handleIGRDatabaseBackup(ctx *fasthttp.RequestCtx) {
+	configs.SetConfig()
+	sugar.Infof("received a IGR Database backup request to Google Sheets!")
+	currentValueInSheets := googleSheets.BatchGet(configs.Configurations.SheetNameWithRange + "!A4:N50000")
+	var finalValuesToSheets [][]interface{}
+	if len(currentValueInSheets) > 0 {
+		iter := 0
+		for iter < len(currentValueInSheets) {
+			iter2 := 0
+			var row []interface{}
+			for iter2 < len(currentValueInSheets[iter]) {
+				row = append(row, currentValueInSheets[iter][iter2])
+				iter2++
+			}
+			finalValuesToSheets = append(finalValuesToSheets, row)
+			iter++
+		}
+		googleSheets.BatchAppend(configs.Configurations.IGRDatabaseSheetName, finalValuesToSheets)
+	}
+	if len(finalValuesToSheets) > 0 {
+		googleSheets.ClearSheet("IGR!A3:M50000")
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		ctx.Response.SetStatusCode(200)
+		ctx.SetBody([]byte("Success IGR Database Google Sheet Updated "))
+		sugar.Infof("calling ig reprts success!")
+	} else {
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		ctx.Response.SetStatusCode(200)
+		ctx.SetBody([]byte("Something went wrong, no data to update IGR database"))
 		sugar.Infof("calling ig reprts failure!")
 	}
 }

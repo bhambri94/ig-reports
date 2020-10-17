@@ -44,6 +44,8 @@ func GetReportNew(userName string, SessionID string) ([][]interface{}, string) {
 	var row []interface{}
 	TotalLikes := 0.0
 	TotalComments := 0.0
+	StandardDeviation := 0.0
+	Variance := 0.0
 	NumberOfPostsOnFirstPage := 12
 	FirstPage := true
 	if len(igResponse.Data.User.EdgeOwnerToTimelineMedia.Edges) > 0 {
@@ -113,6 +115,14 @@ func GetReportNew(userName string, SessionID string) ([][]interface{}, string) {
 		avgEngagement := float64(total) / (9 * float64(Followers))
 		BestEngagement := (float64(TotalLikes) + float64(TotalComments)) / (float64(NumberOfPostsOnFirstPage) * float64(Followers))
 
+		i = 0
+		var sd float64
+		for i < 12 {
+			sd += math.Pow(((float64(Engagement[i]) / float64(Followers)) - BestEngagement), 2)
+			i++
+		}
+		Variance = sd / (float64(NumberOfPostsOnFirstPage))
+		StandardDeviation = math.Sqrt(Variance)
 		MediaTimestamp := t - 1
 		Days := 90
 		i = 0
@@ -153,10 +163,12 @@ func GetReportNew(userName string, SessionID string) ([][]interface{}, string) {
 		}
 		row = append(row, float64(NumberOfPosts30Days)/4)
 		row = append(row, float64(NumberOfPosts90Days)/12)
-		row = append(row, "NA")
+		// row = append(row, "NA")
 		row = append(row, BestEngagement)
 		row = append(row, avgEngagement)
 		row = append(row, (avgEngagement - BestEngagement))
+		row = append(row, Variance)
+		row = append(row, StandardDeviation)
 		row = append(row, TotalComments/float64(NumberOfPostsOnFirstPage))
 		row = append(row, (BestEngagement)-(TotalLikes/(float64(NumberOfPostsOnFirstPage)*float64(Followers))))
 		finalValues = append(finalValues, row)
