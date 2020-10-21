@@ -17,6 +17,77 @@ import (
 	"github.com/bhambri94/ig-reports/configs"
 )
 
+func GetAccountFollowersDetails(userName string, MaxFollowers string, SessionID string) ([][]interface{}, string) {
+	var finalValues [][]interface{}
+	if SessionID == "" {
+		SessionID = configs.Configurations.SessionId
+	}
+	MaxFollowersInt, err := strconv.Atoi(MaxFollowers)
+	if err != nil {
+		MaxFollowersInt = 500
+	}
+	UserID, _, CookieErrorString := GetUserIDAndFollower(userName, GetRandomCookie(SessionID))
+
+	fmt.Println("*****")
+	fmt.Println("User Id found: " + UserID)
+	fmt.Println("*****")
+	if UserID == "" {
+		return nil, CookieErrorString
+	}
+	var igFollowersResearch IGFollowersResearch
+	EndCursor := "first"
+	NextPage := true
+	MaxFollowersCount := 0
+	for NextPage && MaxFollowersCount < MaxFollowersInt {
+		var URL string
+		if EndCursor == "first" {
+			URL = "https://www.instagram.com/graphql/query/?query_hash=d04b0a864b4b54837c0d870b0e77e076&variables=%7B%22id%22%3A%22" + UserID + "%22%2C%22include_reel%22%3Afalse%2C%22fetch_mutual%22%3Afalse%2C%22first%22%3A24%7D"
+		} else {
+			URL = "https://www.instagram.com/graphql/query/?query_hash=d04b0a864b4b54837c0d870b0e77e076&variables=%7B%22id%22%3A%22" + UserID + "%22%2C%22include_reel%22%3Afalse%2C%22fetch_mutual%22%3Afalse%2C%22first%22%3A12%2C%22after%22%3A%22" + EndCursor[:len(EndCursor)-2] + "%3D%3D%22%7D"
+		}
+		fmt.Println(URL)
+		method := "GET"
+
+		client := &http.Client{}
+		req, err := http.NewRequest(method, URL, nil)
+		if err != nil {
+			fmt.Println(err)
+		}
+		if SessionID == "" {
+			SessionID = configs.Configurations.SessionId
+		}
+		req.Header.Add("accept", " */*")
+		req.Header.Add("Cookie", "sessionid="+GetRandomCookie(SessionID))
+
+		res, err := client.Do(req)
+		if err != nil {
+			fmt.Println("username not found")
+		}
+		defer res.Body.Close()
+		body, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			fmt.Println("username not found")
+		}
+		fmt.Println(string(body))
+		json.Unmarshal([]byte(body), &igFollowersResearch)
+		iterator := 0
+		for iterator < len(igFollowersResearch.Data.User.EdgeFollow.Edges) {
+			var row []interface{}
+			if igFollowersResearch.Data.User.EdgeFollow.Edges[iterator].Node.Username != "" && MaxFollowersCount < MaxFollowersInt {
+				MaxFollowersCount++
+				row = append(row, igFollowersResearch.Data.User.EdgeFollow.Edges[iterator].Node.FullName, igFollowersResearch.Data.User.EdgeFollow.Edges[iterator].Node.Username)
+				iterator++
+			} else {
+				break
+			}
+			finalValues = append(finalValues, row)
+		}
+		EndCursor = igFollowersResearch.Data.User.EdgeFollow.PageInfo.EndCursor
+		NextPage = igFollowersResearch.Data.User.EdgeFollow.PageInfo.HasNextPage
+	}
+	return finalValues, CookieErrorString
+}
+
 func GetReportNew(userName string, SessionID string) ([][]interface{}, string) {
 	var finalValues [][]interface{}
 	NumberOfPosts30Days := 0
@@ -522,6 +593,85 @@ func GetFollowers(userName string, MaxFollowers string, SessionID string) ([]str
 		NextPage = igFollowersResearch.Data.User.EdgeFollow.PageInfo.HasNextPage
 	}
 	return finalValues, ""
+}
+
+func GetNewFollowers(userName string, LastFetchedFollowers string, SessionID string) ([]string, string, int) {
+	LastFetchedFollowersInt, err := strconv.Atoi(LastFetchedFollowers)
+	if err != nil {
+		LastFetchedFollowersInt = 10
+	}
+	if SessionID == "" {
+		SessionID = configs.Configurations.SessionId
+	}
+	UserID, _, CookieErrorString := GetUserIDAndFollower(userName, GetRandomCookie(SessionID))
+	fmt.Println("*****")
+	fmt.Println("User Id found: " + UserID)
+	fmt.Println("*****")
+	if UserID == "" {
+		return nil, CookieErrorString, 0
+	}
+	var finalValues []string
+	var igFollowersResearch IGFollowersResearch
+	EndCursor := "first"
+	Firstpage := true
+	BreakFromAllLoops := false
+	NextPage := true
+	var LatestFollowerCount int
+	var NumberOfFollowersNeeded int
+	for NextPage {
+		var URL string
+		if EndCursor == "first" {
+			URL = "https://www.instagram.com/graphql/query/?query_hash=d04b0a864b4b54837c0d870b0e77e076&variables=%7B%22id%22%3A%22" + UserID + "%22%2C%22include_reel%22%3Afalse%2C%22fetch_mutual%22%3Afalse%2C%22first%22%3A24%7D"
+		} else {
+			URL = "https://www.instagram.com/graphql/query/?query_hash=d04b0a864b4b54837c0d870b0e77e076&variables=%7B%22id%22%3A%22" + UserID + "%22%2C%22include_reel%22%3Afalse%2C%22fetch_mutual%22%3Afalse%2C%22first%22%3A12%2C%22after%22%3A%22" + EndCursor[:len(EndCursor)-2] + "%3D%3D%22%7D"
+		}
+		fmt.Println(URL)
+		method := "GET"
+		client := &http.Client{}
+		req, err := http.NewRequest(method, URL, nil)
+		if err != nil {
+			fmt.Println(err)
+		}
+		if SessionID == "" {
+			SessionID = configs.Configurations.SessionId
+		}
+		req.Header.Add("accept", " */*")
+		req.Header.Add("Cookie", "sessionid="+GetRandomCookie(SessionID))
+
+		res, err := client.Do(req)
+		if err != nil {
+			fmt.Println("username not found")
+		}
+		defer res.Body.Close()
+		body, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			fmt.Println("username not found")
+		}
+		fmt.Println(string(body))
+		json.Unmarshal([]byte(body), &igFollowersResearch)
+		iterator := 0
+		if Firstpage {
+			LatestFollowerCount = igFollowersResearch.Data.User.EdgeFollow.Count
+			NumberOfFollowersNeeded = LatestFollowerCount - LastFetchedFollowersInt
+			Firstpage = false
+		}
+		for iterator < len(igFollowersResearch.Data.User.EdgeFollow.Edges) {
+			if igFollowersResearch.Data.User.EdgeFollow.Edges[iterator].Node.Username != "" && NumberOfFollowersNeeded > 0 {
+				finalValues = append(finalValues, igFollowersResearch.Data.User.EdgeFollow.Edges[iterator].Node.Username)
+				iterator++
+				NumberOfFollowersNeeded--
+			} else {
+				BreakFromAllLoops = true
+				break
+			}
+		}
+		EndCursor = igFollowersResearch.Data.User.EdgeFollow.PageInfo.EndCursor
+		NextPage = igFollowersResearch.Data.User.EdgeFollow.PageInfo.HasNextPage
+		if BreakFromAllLoops {
+			break
+		}
+	}
+	return finalValues, "", LatestFollowerCount
 }
 
 func GetIGReport(userNames []string, SearchQuery map[string]int) [][]interface{} {

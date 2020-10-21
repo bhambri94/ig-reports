@@ -8,11 +8,13 @@ import (
 )
 
 type Configs struct {
-	SpreadsheetID        string `json:"SpreadsheetID"`
-	SheetNameWithRange   string `json:"SheetNameWithRange"`
-	ResearchJRSheetName  string `json:"ResearchJRSheetName"`
-	SessionId            string `json:"SessionId"`
-	IGRDatabaseSheetName string `json:"IGRDatabaseSheetName"`
+	SpreadsheetID         string `json:"SpreadsheetID"`
+	SheetNameWithRange    string `json:"SheetNameWithRange"`
+	ResearchJRSheetName   string `json:"ResearchJRSheetName"`
+	SessionId             string `json:"SessionId"`
+	IGRDatabaseSheetName  string `json:"IGRDatabaseSheetName"`
+	NOSSearchSheetName    string `json:"NOSSearchSheetName"`
+	NOSDashboardSheetName string `json:"NOSDashboardSheetName"`
 }
 
 var (
