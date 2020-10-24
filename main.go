@@ -102,7 +102,11 @@ func handleNOSSearchSetup(ctx *fasthttp.RequestCtx) {
 		fmt.Println(LastFetchedFollowerCount)
 		FollowersList, _, LatestFollowerCount := ig.GetNewFollowers(userName, LastFetchedFollowerCount, SessionID.(string))
 		var nosLatestFollowerCountRows []interface{}
-		nosLatestFollowerCountRows = append(nosLatestFollowerCountRows, userName, LatestFollowerCount)
+		if LatestFollowerCount != 0 {
+			nosLatestFollowerCountRows = append(nosLatestFollowerCountRows, userName, LatestFollowerCount)
+		} else {
+			nosLatestFollowerCountRows = append(nosLatestFollowerCountRows, userName)
+		}
 		nosLatestFollowerCountFinalValues = append(nosLatestFollowerCountFinalValues, nosLatestFollowerCountRows)
 		fmt.Println(FollowersList)
 		SearchQuery := make(map[string]int)
