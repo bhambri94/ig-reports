@@ -616,7 +616,7 @@ func GetNewFollowers(userName string, LastFetchedFollowers string, SessionID str
 	Firstpage := true
 	BreakFromAllLoops := false
 	NextPage := true
-	var LatestFollowerCount int
+	LatestFollowerCount := 0
 	var NumberOfFollowersNeeded int
 	for NextPage {
 		var URL string
