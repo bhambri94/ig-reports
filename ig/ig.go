@@ -596,6 +596,7 @@ func GetFollowers(userName string, MaxFollowers string, SessionID string) ([]str
 }
 
 func GetNewFollowers(userName string, LastFetchedFollowers string, SessionID string) ([]string, string, int) {
+	LastFetchedFollowers = strings.Replace(LastFetchedFollowers, ",", "", -1)
 	LastFetchedFollowersInt, err := strconv.Atoi(LastFetchedFollowers)
 	if err != nil {
 		LastFetchedFollowersInt = 10
@@ -647,7 +648,6 @@ func GetNewFollowers(userName string, LastFetchedFollowers string, SessionID str
 		if err != nil {
 			fmt.Println("username not found")
 		}
-		fmt.Println(string(body))
 		json.Unmarshal([]byte(body), &igFollowersResearch)
 		iterator := 0
 		if Firstpage {
