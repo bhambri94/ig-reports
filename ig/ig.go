@@ -653,6 +653,8 @@ func GetNewFollowers(userName string, LastFetchedFollowers string, SessionID str
 		if Firstpage {
 			LatestFollowerCount = igFollowersResearch.Data.User.EdgeFollow.Count
 			NumberOfFollowersNeeded = LatestFollowerCount - LastFetchedFollowersInt
+			fmt.Println("Number Of Top Followers Needed are:")
+			fmt.Println(NumberOfFollowersNeeded)
 			Firstpage = false
 		}
 		for iterator < len(igFollowersResearch.Data.User.EdgeFollow.Edges) {
