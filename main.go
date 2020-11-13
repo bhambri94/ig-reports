@@ -42,7 +42,7 @@ func main() {
 func handleNOSSearchSetup(ctx *fasthttp.RequestCtx) {
 	configs.SetConfig()
 	sugar.Infof("received a NOS Search request to Google Sheets!")
-	SearchQueryFromNOS := googleSheets.BatchGet(configs.Configurations.NOSSearchSheetName + "!A1:I3")
+	SearchQueryFromNOS := googleSheets.BatchGet(configs.Configurations.NOSSearchSheetName + "!A2:I2")
 	fmt.Println(SearchQueryFromNOS)
 	var nosSearchFinalValues [][]interface{}
 	var nosDashboardFinalValues [][]interface{}
@@ -53,15 +53,25 @@ func handleNOSSearchSetup(ctx *fasthttp.RequestCtx) {
 	var MinNStar string
 	var NDelta string
 
-	if len(SearchQueryFromNOS) == 3 {
-		if len(SearchQueryFromNOS[1]) > 8 {
-			MinFollower = SearchQueryFromNOS[1][3]
-			MaxFollower = SearchQueryFromNOS[1][5]
-			MinN = SearchQueryFromNOS[1][6]
-			MinNStar = SearchQueryFromNOS[1][7]
-			NDelta = SearchQueryFromNOS[1][8]
+	if len(SearchQueryFromNOS) == 1 {
+		if len(SearchQueryFromNOS[0]) > 4 {
+			MinFollower = SearchQueryFromNOS[0][3]
+			MaxFollower = SearchQueryFromNOS[0][5]
+			if len(SearchQueryFromNOS[0]) > 6 {
+				MinN = SearchQueryFromNOS[0][6]
+				MinN = strings.Replace(MinN, ",", "", -1)
+			}
+			if len(SearchQueryFromNOS[0]) > 7 {
+				MinNStar = SearchQueryFromNOS[0][7]
+				MinNStar = strings.Replace(MinNStar, ",", "", -1)
+			}
+			if len(SearchQueryFromNOS[0]) > 8 {
+				NDelta = SearchQueryFromNOS[0][8]
+				NDelta = strings.Replace(NDelta, ",", "", -1)
+			}
 		}
 	}
+
 	SessionID := ctx.UserValue("SessionID")
 	if SessionID != nil {
 		temp := SessionID.(string)
