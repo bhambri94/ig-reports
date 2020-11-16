@@ -57,6 +57,8 @@ func handleNOSSearchSetup(ctx *fasthttp.RequestCtx) {
 		if len(SearchQueryFromNOS[0]) > 4 {
 			MinFollower = SearchQueryFromNOS[0][3]
 			MaxFollower = SearchQueryFromNOS[0][5]
+			MinFollower = strings.Replace(MinFollower, ",", "", -1)
+			MaxFollower = strings.Replace(MaxFollower, ",", "", -1)
 			if len(SearchQueryFromNOS[0]) > 6 {
 				MinN = SearchQueryFromNOS[0][6]
 				MinN = strings.Replace(MinN, ",", "", -1)
@@ -494,7 +496,7 @@ func handleIGRDatabaseBackup(ctx *fasthttp.RequestCtx) {
 		googleSheets.BatchAppend(configs.Configurations.IGRDatabaseSheetName, finalValuesToSheets)
 	}
 	if len(finalValuesToSheets) > 0 {
-		googleSheets.ClearSheet("IGR!A4:M50000")
+		googleSheets.ClearSheet("SCAN!A4:M50000")
 		ctx.Response.Header.Set("Content-Type", "application/json")
 		ctx.Response.SetStatusCode(200)
 		ctx.SetBody([]byte("Success IGR Database Google Sheet Updated "))
