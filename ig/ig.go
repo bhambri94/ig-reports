@@ -498,7 +498,7 @@ func GetUserIDAndFollower(userName string, SessionID string) (string, int, strin
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
-	// fmt.Println(string(body))
+	fmt.Println(string(body))
 	if err != nil {
 		fmt.Println("Error")
 		return "", 0, "Issue with Cookie:" + SessionID
