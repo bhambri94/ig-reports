@@ -224,6 +224,7 @@ func handleSaveIGResearchToSheets(ctx *fasthttp.RequestCtx) {
 	MinNStar := ctx.UserValue("MinNStar")
 	SessionID := ctx.UserValue("SessionID")
 	NDelta := ctx.UserValue("NDelta")
+	fmt.Println(SessionID)
 	if SessionID != nil {
 		temp := SessionID.(string)
 		temp = temp[1 : len(temp)-1]
@@ -236,7 +237,6 @@ func handleSaveIGResearchToSheets(ctx *fasthttp.RequestCtx) {
 	fmt.Println(MinN)
 	fmt.Println(MinNStar)
 	fmt.Println(NDelta)
-	fmt.Println(SessionID)
 	FollowersList, CookieErrorString1 := ig.GetFollowers(userName.(string), LatestFollowerCount.(string)[1:len(LatestFollowerCount.(string))-1], SessionID.(string))
 	SearchQuery := make(map[string]int)
 	if MinFollower != nil {
