@@ -479,16 +479,16 @@ func GetUserIDAndFollower(userName string, SessionID string) (string, int, strin
 	if err != nil {
 		// handle err
 	}
-	req.Header.Set("Authority", "www.instagram.com")
-	req.Header.Set("Cache-Control", "max-age=0")
-	req.Header.Set("Upgrade-Insecure-Requests", "1")
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Linux; Android 9; SM-A102U Build/PPR1.180610.011; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.136 Mobile Safari/537.36 Instagram 155.0.0.37.107 Android (28/9; 320dpi; 720x1468; samsung; SM-A102U; a10e; exynos7885; en_US; 239490550)")
-	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
-	req.Header.Set("Sec-Fetch-Site", "same-origin")
-	req.Header.Set("Sec-Fetch-Mode", "navigate")
-	req.Header.Set("Sec-Fetch-User", "?1")
-	req.Header.Set("Sec-Fetch-Dest", "document")
-	req.Header.Set("Accept-Language", "en-GB,en-US;q=0.9,en;q=0.8")
+	// req.Header.Set("Authority", "www.instagram.com")
+	// req.Header.Set("Cache-Control", "max-age=0")
+	// req.Header.Set("Upgrade-Insecure-Requests", "1")
+	// req.Header.Set("User-Agent", "Mozilla/5.0 (Linux; Android 9; SM-A102U Build/PPR1.180610.011; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.136 Mobile Safari/537.36 Instagram 155.0.0.37.107 Android (28/9; 320dpi; 720x1468; samsung; SM-A102U; a10e; exynos7885; en_US; 239490550)")
+	// req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
+	// req.Header.Set("Sec-Fetch-Site", "same-origin")
+	// req.Header.Set("Sec-Fetch-Mode", "navigate")
+	// req.Header.Set("Sec-Fetch-User", "?1")
+	// req.Header.Set("Sec-Fetch-Dest", "document")
+	// req.Header.Set("Accept-Language", "en-GB,en-US;q=0.9,en;q=0.8")
 	req.Header.Add("Cookie", "sessionid="+SessionID)
 
 	resp, err := http.DefaultClient.Do(req)
@@ -516,6 +516,7 @@ func GetUserIDAndFollower(userName string, SessionID string) (string, int, strin
 		}
 		var igResponse IGResponse
 		json.Unmarshal([]byte(filteredString), &igResponse)
+		fmt.Println(igResponse)
 		if len(igResponse.EntryData.ProfilePage) > 0 {
 			return igResponse.EntryData.ProfilePage[0].Graphql.User.ID, igResponse.EntryData.ProfilePage[0].Graphql.User.EdgeFollowedBy.Count, ""
 		}
