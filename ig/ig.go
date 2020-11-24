@@ -440,7 +440,84 @@ type InstaID struct {
 	Biography     string `json:"biography"`
 }
 
+type NewInstaID struct {
+	Users []struct {
+		Position int `json:"position"`
+		User     struct {
+			Pk                         string        `json:"pk"`
+			Username                   string        `json:"username"`
+			FullName                   string        `json:"full_name"`
+			IsPrivate                  bool          `json:"is_private"`
+			ProfilePicURL              string        `json:"profile_pic_url"`
+			ProfilePicID               string        `json:"profile_pic_id"`
+			IsVerified                 bool          `json:"is_verified"`
+			HasAnonymousProfilePicture bool          `json:"has_anonymous_profile_picture"`
+			MutualFollowersCount       int           `json:"mutual_followers_count"`
+			AccountBadges              []interface{} `json:"account_badges"`
+			FriendshipStatus           struct {
+				Following       bool `json:"following"`
+				IsPrivate       bool `json:"is_private"`
+				IncomingRequest bool `json:"incoming_request"`
+				OutgoingRequest bool `json:"outgoing_request"`
+				IsBestie        bool `json:"is_bestie"`
+				IsRestricted    bool `json:"is_restricted"`
+			} `json:"friendship_status"`
+			LatestReelMedia int `json:"latest_reel_media"`
+		} `json:"user,omitempty"`
+		Places   []interface{} `json:"places"`
+		Hashtags []struct {
+			Position int `json:"position"`
+			Hashtag  struct {
+				Name                 string `json:"name"`
+				ID                   int64  `json:"id"`
+				MediaCount           int    `json:"media_count"`
+				UseDefaultAvatar     bool   `json:"use_default_avatar"`
+				ProfilePicURL        string `json:"profile_pic_url"`
+				SearchResultSubtitle string `json:"search_result_subtitle"`
+			} `json:"hashtag"`
+		} `json:"hashtags"`
+		HasMore          bool        `json:"has_more"`
+		RankToken        string      `json:"rank_token"`
+		ClearClientCache interface{} `json:"clear_client_cache"`
+		Status           string      `json:"status"`
+	}
+}
+
 func GetUserIDAndFollower(userName string, SessionID string) (string, int, string) {
+	Url := "https://www.instagram.com/web/search/topsearch/?context=blended&query=" + userName + "&rank_token=0.7584840628946048"
+	req, err := http.NewRequest("GET", Url, nil)
+	if err != nil {
+		// handle err
+	}
+	req.Header.Set("Authority", "www.instagram.com")
+	req.Header.Set("Cache-Control", "max-age=0")
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Linux; Android 9; SM-A102U Build/PPR1.180610.011; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.136 Mobile Safari/537.36 Instagram 155.0.0.37.107 Android (28/9; 320dpi; 720x1468; samsung; SM-A102U; a10e; exynos7885; en_US; 239490550)")
+	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
+	req.Header.Set("Sec-Fetch-Site", "same-origin")
+	req.Header.Set("Sec-Fetch-Mode", "navigate")
+	req.Header.Set("Sec-Fetch-User", "?1")
+	req.Header.Set("Sec-Fetch-Dest", "document")
+	req.Header.Set("Accept-Language", "en-GB,en-US;q=0.9,en;q=0.8")
+	req.Header.Add("Cookie", "sessionid="+SessionID)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		// handle err
+		return "", 0, "Issue with Cookie:" + SessionID
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	fmt.Println(string(body))
+	var newInstaID NewInstaID
+	json.Unmarshal([]byte(body), &newInstaID)
+	if len(newInstaID.Users[0].User.Pk) > 0 {
+		return newInstaID.Users[0].User.Pk, 0, ""
+	} else {
+		return "", 0, "Issue with Cookie:" + SessionID
+	}
+}
+
+func GetUserIDAndFollower2(userName string, SessionID string) (string, int, string) {
 	// req, err := http.NewRequest("GET", "https://commentpicker.com/actions/instagram-id-action.php?username="+userName+"&token=29dd11e760c54402744ef2c3273ea2e3c901f88fb4ae749b4882856568ece7b0", nil)
 	// if err != nil {
 	// 	// handle err
