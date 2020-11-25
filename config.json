@@ -5,5 +5,6 @@
     "SessionId":"41670979469%3AaxqBtqpjAu1W67%3A23;",
     "IGRDatabaseSheetName":"SCAN-DB!A4:N50000",
     "NOSSearchSheetName":"TRACK-Searches",
-    "NOSDashboardSheetName":"TRACK!A4:I50000"
+    "NOSDashboardSheetName":"TRACK!A4:I50000",
+    "NOSSearch2SheetName":"TRACK-Search-#2"
 }

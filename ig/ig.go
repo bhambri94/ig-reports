@@ -510,11 +510,12 @@ func GetUserIDAndFollower(userName string, SessionID string) (string, int, strin
 	fmt.Println(string(body))
 	var newInstaID NewInstaID
 	json.Unmarshal([]byte(body), &newInstaID)
-	if len(newInstaID.Users[0].User.Pk) > 0 {
-		return newInstaID.Users[0].User.Pk, 0, ""
-	} else {
-		return "", 0, "Issue with Cookie:" + SessionID
+	if len(newInstaID.Users) > 0 {
+		if len(newInstaID.Users[0].User.Pk) > 0 {
+			return newInstaID.Users[0].User.Pk, 0, ""
+		}
 	}
+	return "", 0, "Issue with Cookie:" + SessionID
 }
 
 func GetUserIDAndFollower2(userName string, SessionID string) (string, int, string) {
@@ -731,6 +732,9 @@ func GetNewFollowers(userName string, LastFetchedFollowers string, SessionID str
 		if Firstpage {
 			LatestFollowerCount = igFollowersResearch.Data.User.EdgeFollow.Count
 			NumberOfFollowersNeeded = LatestFollowerCount - LastFetchedFollowersInt
+			fmt.Println(igFollowersResearch)
+			fmt.Println(LatestFollowerCount)
+			fmt.Println(LastFetchedFollowersInt)
 			fmt.Println("Number Of Top Followers Needed are:")
 			fmt.Println(NumberOfFollowersNeeded)
 			Firstpage = false

@@ -14,6 +14,7 @@ type Configs struct {
 	SessionId             string `json:"SessionId"`
 	IGRDatabaseSheetName  string `json:"IGRDatabaseSheetName"`
 	NOSSearchSheetName    string `json:"NOSSearchSheetName"`
+	NOSSearch2SheetName   string `json:"NOSSearch2SheetName"`
 	NOSDashboardSheetName string `json:"NOSDashboardSheetName"`
 }
 
