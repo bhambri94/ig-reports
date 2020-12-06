@@ -878,6 +878,9 @@ func GetIGReportNew(userNames []string, SearchQuery map[string]int, SessionID st
 		UserId, _, CookieErrorString := GetUserIDAndFollower(userNames[parentIterator], GetRandomCookie(SessionID))
 		Url := "https://www.instagram.com/graphql/query/?query_hash=bfa387b2992c3a52dcbe447467b4b771&variables=%7B%22id%22%3A%22" + UserId + "%22%2C%22first%22%3A12%7D"
 		fmt.Println(Url)
+		if SessionID == "" {
+			SessionID = configs.Configurations.SessionId
+		}
 		method := "GET"
 		client := &http.Client{}
 		req, err := http.NewRequest(method, Url, nil)
@@ -885,6 +888,7 @@ func GetIGReportNew(userNames []string, SearchQuery map[string]int, SessionID st
 			fmt.Println(err)
 		}
 		req.Header.Add("accept", " */*")
+		req.Header.Add("Cookie", "sessionid="+GetRandomCookie(SessionID))
 		res, err := client.Do(req)
 		if err != nil {
 			fmt.Println("username not found")
