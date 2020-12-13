@@ -890,6 +890,7 @@ func GetIGReportNew(userNames []string, SearchQuery map[string]int, SessionID st
 	NoOneSucceeded := 0
 	var CookieErrorString string
 	for parentIterator < len(userNames) {
+		FirstPage := true
 		var row []interface{}
 		time.Sleep(1000 * time.Millisecond)
 		UserId, _, CookieErrorString := GetUserIDAndFollower(userNames[parentIterator], GetRandomCookie(SessionID))
@@ -919,6 +920,13 @@ func GetIGReportNew(userNames []string, SearchQuery map[string]int, SessionID st
 		json.Unmarshal([]byte(resp), &igResponse)
 		TotalLikes := 0.0
 		TotalComments := 0.0
+		StandardDeviation := 0.0
+		Variance := 0.0
+		NumberOfPostsOnFirstPage := 12
+		if FirstPage {
+			NumberOfPostsOnFirstPage = len(igResponse.Data.User.EdgeOwnerToTimelineMedia.Edges)
+			FirstPage = false
+		}
 		if len(igResponse.Data.User.EdgeOwnerToTimelineMedia.Edges) > 0 {
 			FollowerURL := "https://www.instagram.com/graphql/query/?query_hash=c76146de99bb02f6415203be841dd25a&variables=%7B%22id%22%3A%22" + UserId + "%22%2C%22include_reel%22%3Afalse%2C%22fetch_mutual%22%3Afalse%2C%22first%22%3A24%7D"
 			fmt.Println(FollowerURL)
@@ -986,6 +994,15 @@ func GetIGReportNew(userNames []string, SearchQuery map[string]int, SessionID st
 			BestEngagement := BestEngagementFloat * 100
 			avgEngagementFloat := (float64(TotalLikes) + float64(TotalComments)) / (12 * float64(Followers))
 			avgEngagement := avgEngagementFloat * 100
+
+			i = 0
+			var sd float64
+			for i < 12 {
+				sd += math.Pow(((float64(Engagement[i]) / float64(Followers)) - BestEngagement), 2)
+				i++
+			}
+			Variance = sd / (float64(NumberOfPostsOnFirstPage))
+			StandardDeviation = math.Sqrt(Variance)
 			fmt.Println(float64(Followers))
 			fmt.Println(BestEngagement)
 			fmt.Println(avgEngagement)
@@ -1012,7 +1029,7 @@ func GetIGReportNew(userNames []string, SearchQuery map[string]int, SessionID st
 					continue
 				}
 			}
-			row = append(row, userNames[parentIterator], "https://www.instagram.com/"+userNames[parentIterator], "", Followers, avgEngagementFloat, BestEngagementFloat, BestEngagementFloat-avgEngagementFloat)
+			row = append(row, userNames[parentIterator], "https://www.instagram.com/"+userNames[parentIterator], "", Followers, avgEngagementFloat, BestEngagementFloat, BestEngagementFloat-avgEngagementFloat, Variance, StandardDeviation)
 		}
 		finalValues = append(finalValues, row)
 		parentIterator++
