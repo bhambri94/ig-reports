@@ -407,7 +407,7 @@ func handleNOSSearchSetup1(ctx *fasthttp.RequestCtx) {
 		temp = temp[1 : len(temp)-1]
 		SessionID = temp
 	}
-	NoOneSucceededBoolean := false
+	// NoOneSucceededBoolean := false
 	var CookieErrorString1 string
 	SourceSearchQueryFromNOS := googleSheets.BatchGet(configs.Configurations.NOSSearchSheetName + "!A4:B5000")
 	sourceIterator := 0
@@ -500,7 +500,7 @@ func handleNOSSearchSetup1(ctx *fasthttp.RequestCtx) {
 			var searchRow []interface{}
 			var dashboardRow []interface{}
 			if (len(reportValues[i])) == 7 {
-				dashboardRow = append(dashboardRow, Time, "Top A&Rs", userName, reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
+				dashboardRow = append(dashboardRow, Time, "#1", userName, reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
 				nosDashboardFinalValues = append(nosDashboardFinalValues, dashboardRow)
 				searchRow = append(searchRow, Time, reportValues[i][0], userName, reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
 				nosSearchFinalValues = append(nosSearchFinalValues, searchRow)
