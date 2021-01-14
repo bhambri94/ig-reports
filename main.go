@@ -253,7 +253,8 @@ func handleNOSSearchSetupLatest(ctx *fasthttp.RequestCtx) {
 	Time := currentTime.Format("2006-01-02")
 	for sourceIterator < len(SourceSearchQueryFromNOS) {
 		if len(SourceSearchQueryFromNOS[sourceIterator]) != 2 {
-			return
+			sourceIterator++
+			continue
 		}
 		fmt.Println(MinFollower)
 		fmt.Println(MaxFollower)
@@ -268,7 +269,8 @@ func handleNOSSearchSetupLatest(ctx *fasthttp.RequestCtx) {
 			ctx.Response.SetStatusCode(200)
 			ctx.SetBody([]byte("Failed! Unable to Find USERNAME shared in URL"))
 			sugar.Infof("calling ig reprts failure due to username!")
-			return
+			sourceIterator++
+			continue
 		}
 		LastFetchedFollowerCount := SourceSearchQueryFromNOS[sourceIterator][1]
 		if LastFetchedFollowerCount == "" {
@@ -329,7 +331,7 @@ func handleNOSSearchSetupLatest(ctx *fasthttp.RequestCtx) {
 		for i < len(reportValues) {
 			var searchRow []interface{}
 			var dashboardRow []interface{}
-			if (len(reportValues[i])) == 7 {
+			if (len(reportValues[i])) > 5 {
 				dashboardRow = append(dashboardRow, Time, "Top A&Rs", userName, reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
 				nosDashboardFinalValues = append(nosDashboardFinalValues, dashboardRow)
 				searchRow = append(searchRow, Time, reportValues[i][0], userName, reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
