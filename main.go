@@ -513,27 +513,26 @@ func handleNOSSearchSetup1(ctx *fasthttp.RequestCtx) {
 	fmt.Println(nosDashboardFinalValues)
 	fmt.Println("#########")
 	fmt.Println(nosSearchFinalValues)
-	if len(nosDashboardFinalValues) > 0 {
-		googleSheets.BatchAppend(configs.Configurations.NOSDashboardSheetName, nosDashboardFinalValues)
-		existingRows := googleSheets.BatchGet(configs.Configurations.NOSSearchSheetName + "!H4:N5000")
-		StartingRow := len(existingRows) + 3 + 1
-		googleSheets.BatchWrite(configs.Configurations.NOSSearchSheetName+"!H"+strconv.Itoa(StartingRow)+":N5000", nosSearchFinalValues)
-		googleSheets.BatchWrite(configs.Configurations.NOSSearchSheetName+"!A4:B5000", nosLatestFollowerCountFinalValues)
-		ctx.Response.Header.Set("Content-Type", "application/json")
-		ctx.Response.SetStatusCode(200)
-		ctx.SetBody([]byte("Success Google Sheet Updated" + " -- " + CookieErrorString1))
-		sugar.Infof("calling ig research reports success!")
-	} else if NoOneSucceededBoolean {
-		ctx.Response.Header.Set("Content-Type", "application/json")
-		ctx.Response.SetStatusCode(200)
-		ctx.SetBody([]byte("Noone passed the filter search query"))
-		sugar.Infof("calling ig research reports success!" + " -- " + CookieErrorString1)
-	} else {
-		ctx.Response.Header.Set("Content-Type", "application/json")
-		ctx.Response.SetStatusCode(200)
-		ctx.SetBody([]byte("Something went wrong, not able to fetch data"))
-		sugar.Infof("calling ig research reports failure!" + " -- " + CookieErrorString1)
-	}
+	googleSheets.BatchAppend(configs.Configurations.NOSDashboardSheetName, nosDashboardFinalValues)
+	existingRows := googleSheets.BatchGet(configs.Configurations.NOSSearchSheetName + "!H4:N5000")
+	StartingRow := len(existingRows) + 3 + 1
+	googleSheets.BatchWrite(configs.Configurations.NOSSearchSheetName+"!H"+strconv.Itoa(StartingRow)+":N5000", nosSearchFinalValues)
+	googleSheets.BatchWrite(configs.Configurations.NOSSearchSheetName+"!A4:B5000", nosLatestFollowerCountFinalValues)
+	ctx.Response.Header.Set("Content-Type", "application/json")
+	ctx.Response.SetStatusCode(200)
+	ctx.SetBody([]byte("Success Google Sheet Updated" + " -- " + CookieErrorString1))
+	sugar.Infof("calling ig research reports success!")
+	// if NoOneSucceededBoolean {
+	// 	ctx.Response.Header.Set("Content-Type", "application/json")
+	// 	ctx.Response.SetStatusCode(200)
+	// 	ctx.SetBody([]byte("Noone passed the filter search query"))
+	// 	sugar.Infof("calling ig research reports success!" + " -- " + CookieErrorString1)
+	// } else {
+	// 	ctx.Response.Header.Set("Content-Type", "application/json")
+	// 	ctx.Response.SetStatusCode(200)
+	// 	ctx.SetBody([]byte("Something went wrong, not able to fetch data"))
+	// 	sugar.Infof("calling ig research reports failure!" + " -- " + CookieErrorString1)
+	// }
 }
 
 func handleSaveIGResearchToSheets(ctx *fasthttp.RequestCtx) {
