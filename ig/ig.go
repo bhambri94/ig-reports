@@ -999,10 +999,12 @@ func GetIGReportNew(userNames []string, SearchQuery map[string]int, SessionID st
 			avgEngagementFloat := (float64(TotalLikes) + float64(TotalComments)) / (12 * float64(Followers))
 			avgEngagement := avgEngagementFloat * 100
 
+			BestEngagementForSD := (float64(TotalLikes) + float64(TotalComments)) / (float64(NumberOfPostsOnFirstPage) * float64(Followers))
+
 			i = 0
 			var sd float64
 			for i < 12 {
-				sd += math.Pow(((float64(Engagement[i]) / float64(Followers)) - BestEngagement), 2)
+				sd += math.Pow(((float64(Engagement[i]) / float64(Followers)) - BestEngagementForSD), 2)
 				i++
 			}
 			Variance = sd / (float64(NumberOfPostsOnFirstPage))
