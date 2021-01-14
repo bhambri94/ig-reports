@@ -493,7 +493,7 @@ func handleNOSSearchSetup1(ctx *fasthttp.RequestCtx) {
 			}
 		}
 		var reportValues [][]interface{}
-		reportValues, NoOneSucceededBoolean, CookieErrorString1 = ig.GetIGReportNew(FollowersList, SearchQuery, SessionID.(string), NDeltaFloat)
+		reportValues, _, CookieErrorString1 = ig.GetIGReportNew(FollowersList, SearchQuery, SessionID.(string), NDeltaFloat)
 		fmt.Println(reportValues)
 		i := 0
 		for i < len(reportValues) {
