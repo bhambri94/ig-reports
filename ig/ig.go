@@ -151,7 +151,6 @@ func GetReportNew(userName string, SessionID string) ([][]interface{}, string) {
 		}
 		Cookie := GetRandomCookie(SessionID)
 		req.Header.Add("Cookie", "sessionid="+Cookie)
-		//		req.Header.Add("Cookie", "ig_did=2E8DBEA9-6BAB-4214-BE14-3E92C1956C79; mid=X2Cs0AAEAAH4q10wWRKpkOR7Vcxk; csrftoken=85768r6cbvT6MHcJ7JXRjAz30M7ZyWWP; ds_user_id=41670979469; sessionid=41670979469%3AXIijRyjzHto0c7%3A26; rur=PRN;")
 		res, err := client.Do(req)
 		if err != nil {
 			fmt.Println("username not found")
@@ -169,7 +168,6 @@ func GetReportNew(userName string, SessionID string) ([][]interface{}, string) {
 		row = append(row, userName)
 		Followers := igFollowersResearch.Data.User.EdgeFollowedBy.Count
 		row = append(row, Followers)
-		// row = append(row, "NA")
 		row = append(row, igResponse.Data.User.EdgeOwnerToTimelineMedia.Count)
 		if FirstPage {
 			NumberOfPostsOnFirstPage = len(igResponse.Data.User.EdgeOwnerToTimelineMedia.Edges)
@@ -519,7 +517,6 @@ func GetUserIDAndFollower(userName string, SessionID string) (string, int, strin
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		// handle err
 		return "", 0, "Issue with Cookie:" + SessionID
 	}
 	defer resp.Body.Close()
@@ -695,7 +692,7 @@ func GetNewFollowers(userName string, LastFetchedFollowers string, SessionID str
 	LastFetchedFollowers = strings.Replace(LastFetchedFollowers, ",", "", -1)
 	LastFetchedFollowersInt, err := strconv.Atoi(LastFetchedFollowers)
 	if err != nil {
-		LastFetchedFollowersInt = 10
+		LastFetchedFollowersInt = 25
 	}
 	if SessionID == "" {
 		SessionID = configs.Configurations.SessionId
@@ -728,6 +725,7 @@ func GetNewFollowers(userName string, LastFetchedFollowers string, SessionID str
 		req, err := http.NewRequest(method, URL, nil)
 		if err != nil {
 			fmt.Println(err)
+			return nil, CookieErrorString, 0
 		}
 		if SessionID == "" {
 			SessionID = configs.Configurations.SessionId
@@ -738,18 +736,24 @@ func GetNewFollowers(userName string, LastFetchedFollowers string, SessionID str
 		res, err := client.Do(req)
 		if err != nil {
 			fmt.Println("username not found")
+			return nil, CookieErrorString, 0
 		}
 		defer res.Body.Close()
 		body, err := ioutil.ReadAll(res.Body)
 		if err != nil {
 			fmt.Println("username not found")
+			return nil, CookieErrorString, 0
 		}
 		json.Unmarshal([]byte(body), &igFollowersResearch)
 		iterator := 0
 		if Firstpage {
 			LatestFollowerCount = igFollowersResearch.Data.User.EdgeFollow.Count
 			NumberOfFollowersNeeded = LatestFollowerCount - LastFetchedFollowersInt
+			if NumberOfFollowersNeeded > 50 {
+				NumberOfFollowersNeeded = 25
+			}
 			fmt.Println(igFollowersResearch)
+			fmt.Println("Latest Follower Counts are: ")
 			fmt.Println(LatestFollowerCount)
 			fmt.Println(LastFetchedFollowersInt)
 			fmt.Println("Number Of Top Followers Needed are:")
