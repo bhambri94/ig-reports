@@ -431,11 +431,13 @@ func handleNOSSearchSetup1(ctx *fasthttp.RequestCtx) {
 			ctx.Response.SetStatusCode(200)
 			ctx.SetBody([]byte("Failed! Unable to Find USERNAME shared in URL"))
 			sugar.Infof("calling ig reprts failure due to username!")
+			sourceIterator++
 			continue
 		}
 		LastFetchedFollowerCount := SourceSearchQueryFromNOS[sourceIterator][1]
 		if LastFetchedFollowerCount == "" {
 			LastFetchedFollowerCount = "25"
+			sourceIterator++
 			continue
 		}
 		fmt.Println(userName)
@@ -450,6 +452,7 @@ func handleNOSSearchSetup1(ctx *fasthttp.RequestCtx) {
 		nosLatestFollowerCountFinalValues = append(nosLatestFollowerCountFinalValues, nosLatestFollowerCountRows)
 		fmt.Println(FollowersList)
 		if len(FollowersList) < 1 {
+			sourceIterator++
 			continue
 		}
 		SearchQuery := make(map[string]int)
