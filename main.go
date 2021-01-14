@@ -499,7 +499,7 @@ func handleNOSSearchSetup1(ctx *fasthttp.RequestCtx) {
 		for i < len(reportValues) {
 			var searchRow []interface{}
 			var dashboardRow []interface{}
-			if (len(reportValues[i])) == 7 {
+			if (len(reportValues[i])) > 5 {
 				dashboardRow = append(dashboardRow, Time, "#1", userName, reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
 				nosDashboardFinalValues = append(nosDashboardFinalValues, dashboardRow)
 				searchRow = append(searchRow, Time, reportValues[i][0], userName, reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
