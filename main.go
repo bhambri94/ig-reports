@@ -57,6 +57,7 @@ func handleSessionIDsChecker(ctx *fasthttp.RequestCtx) {
 		var row []interface{}
 		if len(currentValueInSheets[iter1]) > 0 {
 			fmt.Println(currentValueInSheets[iter1][0])
+			time.Sleep(2 * time.Second)
 			status := ig.SessionIDChecker(currentValueInSheets[iter1][0])
 			row = append(row, status, Time)
 			fmt.Println(row)
