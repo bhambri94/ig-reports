@@ -11,6 +11,7 @@ type Configs struct {
 	SpreadsheetID         string `json:"SpreadsheetID"`
 	SheetNameWithRange    string `json:"SheetNameWithRange"`
 	ResearchJRSheetName   string `json:"ResearchJRSheetName"`
+	SessionIDSheetName    string `json:"SessionIDSheetName"`
 	SessionId             string `json:"SessionId"`
 	IGRDatabaseSheetName  string `json:"IGRDatabaseSheetName"`
 	NOSSearchSheetName    string `json:"NOSSearchSheetName"`

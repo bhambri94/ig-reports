@@ -32,6 +32,7 @@ func main() {
 	router := fasthttprouter.New()
 	router.GET("/v1/get/ig/report/username=:USERNAME/SessionID=:SessionID", handleSaveIGReportToSheetsNew)
 	router.GET("/v1/get/igr/database-backup", handleIGRDatabaseBackup)
+	router.GET("/v1/session/check", handleSessionIDsChecker)
 	router.GET("/v1/get/nos/search/SessionID=:SessionID", handleNOSSearchSetup1)
 	router.GET("/v2/get/nos/search/SessionID=:SessionID", handleNOSSearchSetupLatest)
 	router.GET("/v3/get/nos/search/SessionID=:SessionID", handleNOSSearchSetup3)
@@ -40,6 +41,43 @@ func main() {
 	router.GET("/v1/get/ig/research/username=:USERNAME/LatestFollowerCount=:LatestFollowerCount/MinFollower=:MinFollower/MaxFollower=:MaxFollower/MinN=:MinN/MinNStar=:MinNStar/NDelta=:NDelta/SessionID=:SessionID", handleSaveIGResearchToSheets)
 	router.GET("/v1/get/ig/nos/username=:USERNAME/LatestFollowerCount=:LatestFollowerCount/MinFollower=:MinFollower/MaxFollower=:MaxFollower/MinN=:MinN/MinNStar=:MinNStar/NDelta=:NDelta/SessionID=:SessionID", handleSaveIGResearchToSheets)
 	log.Fatal(fasthttp.ListenAndServe(":3003", router.Handler))
+}
+
+func handleSessionIDsChecker(ctx *fasthttp.RequestCtx) {
+	configs.SetConfig()
+	sugar.Infof("received a session id checker request to Google Sheets!")
+	var finalValues [][]interface{}
+	loc, _ := time.LoadLocation("Europe/Rome")
+	currentTime := time.Now().In(loc)
+	Time := currentTime.Format("2006-01-02")
+	currentValueInSheets := googleSheets.BatchGet(configs.Configurations.SessionIDSheetName + "!A3:D500")
+
+	iter1 := 0
+	for iter1 < len(currentValueInSheets) {
+		var row []interface{}
+		if len(currentValueInSheets[iter1]) > 0 {
+			fmt.Println(currentValueInSheets[iter1][0])
+			status := ig.SessionIDChecker(currentValueInSheets[iter1][0])
+			row = append(row, status, Time)
+			fmt.Println(row)
+
+		}
+		finalValues = append(finalValues, row)
+		fmt.Println(finalValues)
+		iter1++
+	}
+	if len(finalValues) > 0 {
+		googleSheets.BatchWrite(configs.Configurations.SessionIDSheetName+"!E3:F500", finalValues)
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		ctx.Response.SetStatusCode(200)
+		ctx.SetBody([]byte("Success Google Sheet Updated"))
+		sugar.Infof("calling session cookie checker success!")
+	} else {
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		ctx.Response.SetStatusCode(200)
+		ctx.SetBody([]byte("Something went wrong, not able to fetch data "))
+		sugar.Infof("calling session cookie checker failure!")
+	}
 }
 
 func handleNOSSearchSetup(ctx *fasthttp.RequestCtx) {
