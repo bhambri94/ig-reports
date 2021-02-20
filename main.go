@@ -33,6 +33,7 @@ func main() {
 	router.GET("/v1/get/ig/report/username=:USERNAME/SessionID=:SessionID", handleSaveIGReportToSheetsNew)
 	router.GET("/v1/get/igr/database-backup", handleIGRDatabaseBackup)
 	router.GET("/v1/session/check", handleSessionIDsChecker)
+	router.GET("/v1/follower/count/SessionID=:SessionID", handleLatestFollowerCount)
 	router.GET("/v1/get/nos/search/SessionID=:SessionID", handleNOSSearchSetup1)
 	router.GET("/v2/get/nos/search/SessionID=:SessionID", handleNOSSearchSetupLatest)
 	router.GET("/v3/get/nos/search/SessionID=:SessionID", handleNOSSearchSetup3)
@@ -43,6 +44,46 @@ func main() {
 	router.GET("/v1/get/ig/research/username=:USERNAME/LatestFollowerCount=:LatestFollowerCount/MinFollower=:MinFollower/MaxFollower=:MaxFollower/MinN=:MinN/MinNStar=:MinNStar/NDelta=:NDelta/SessionID=:SessionID", handleSaveIGResearchToSheets)
 	router.GET("/v1/get/ig/nos/username=:USERNAME/LatestFollowerCount=:LatestFollowerCount/MinFollower=:MinFollower/MaxFollower=:MaxFollower/MinN=:MinN/MinNStar=:MinNStar/NDelta=:NDelta/SessionID=:SessionID", handleSaveIGResearchToSheets)
 	log.Fatal(fasthttp.ListenAndServe(":3003", router.Handler))
+}
+
+func handleLatestFollowerCount(ctx *fasthttp.RequestCtx) {
+	configs.SetConfig()
+	sugar.Infof("received a latest follower count request from paperclip!")
+	var finalValues [][]interface{}
+	SessionID := ctx.UserValue("SessionID")
+	if SessionID != nil {
+		temp := SessionID.(string)
+		temp = temp[1 : len(temp)-1]
+		SessionID = temp
+	}
+	currentValueInSheets := googleSheets.BatchGet(configs.Configurations.FollowingCountSheetName)
+	iter1 := 0
+	for iter1 < len(currentValueInSheets) {
+		var row []interface{}
+		if len(currentValueInSheets[iter1]) > 0 {
+			time.Sleep(2 * time.Second)
+			UserID, _, _ := ig.GetUserIDAndFollower(currentValueInSheets[iter1][0], SessionID.(string))
+			LatestFollowingCount := ig.GetLatestFollowingCount(UserID, SessionID.(string))
+			row = append(row, currentValueInSheets[iter1][0], LatestFollowingCount)
+			fmt.Println(row)
+		}
+		finalValues = append(finalValues, row)
+		fmt.Println(finalValues)
+		iter1++
+	}
+	if len(finalValues) > 0 {
+		googleSheets.ClearSheet(configs.Configurations.FollowingCountSheetName)
+		googleSheets.BatchWrite(configs.Configurations.FollowingCountSheetName, finalValues)
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		ctx.Response.SetStatusCode(200)
+		ctx.SetBody([]byte("Success Google Sheet Updated"))
+		sugar.Infof("calling session cookie checker success!")
+	} else {
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		ctx.Response.SetStatusCode(200)
+		ctx.SetBody([]byte("Something went wrong, not able to fetch data "))
+		sugar.Infof("calling session cookie checker failure!")
+	}
 }
 
 func handleSessionIDsChecker(ctx *fasthttp.RequestCtx) {

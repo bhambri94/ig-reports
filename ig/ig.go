@@ -88,6 +88,36 @@ func GetAccountFollowersDetails(userName string, MaxFollowers string, SessionID 
 	return finalValues, CookieErrorString
 }
 
+func GetLatestFollowingCount(userId string, SessionID string) string {
+	req, err := http.NewRequest("GET", "https://www.instagram.com/graphql/query/?query_hash=3dec7e2c57367ef3da3d987d89f9dbc8&variables=%7B%22id%22%3A%22"+userId+"%22%2C%22include_reel%22%3Atrue%2C%22fetch_mutual%22%3Afalse%2C%22first%22%3A12%7D", nil)
+	if err != nil {
+		// handle err
+	}
+	Cookie := GetRandomCookie(SessionID)
+	req.Header.Set("Authority", "www.instagram.com")
+	req.Header.Set("Accept", "*/*")
+	req.Header.Set("X-Requested-With", "XMLHttpRequest")
+	req.Header.Set("Sec-Fetch-Site", "same-origin")
+	req.Header.Set("Sec-Fetch-Mode", "cors")
+	req.Header.Set("Sec-Fetch-Dest", "empty")
+	req.Header.Set("Accept-Language", "en-GB,en-US;q=0.9,en;q=0.8")
+	req.Header.Add("Cookie", "sessionid="+Cookie)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		// handle err
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("username not found")
+	}
+	var igFollowingAllResearch IGFollowingAllResearch
+	json.Unmarshal([]byte(body), &igFollowingAllResearch)
+	LatestFollowingCount := igFollowingAllResearch.Data.User.EdgeFollow.Count
+	return strconv.Itoa(LatestFollowingCount)
+}
+
 func GetReportNew(userName string, SessionID string) ([][]interface{}, string) {
 	var finalValues [][]interface{}
 	NumberOfPosts30Days := 0
@@ -1597,6 +1627,16 @@ type IGFollowersAllResearch struct {
 			EdgeFollowedBy struct {
 				Count int `json:"count"`
 			} `json:"edge_followed_by"`
+		} `json:"user"`
+	} `json:"data"`
+}
+
+type IGFollowingAllResearch struct {
+	Data struct {
+		User struct {
+			EdgeFollow struct {
+				Count int `json:"count"`
+			} `json:"edge_follow"`
 		} `json:"user"`
 	} `json:"data"`
 }

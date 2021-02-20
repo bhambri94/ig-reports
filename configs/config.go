@@ -8,19 +8,20 @@ import (
 )
 
 type Configs struct {
-	SpreadsheetID         string `json:"SpreadsheetID"`
-	SheetNameWithRange    string `json:"SheetNameWithRange"`
-	ResearchJRSheetName   string `json:"ResearchJRSheetName"`
-	SessionIDSheetName    string `json:"SessionIDSheetName"`
-	SessionId             string `json:"SessionId"`
-	IGRDatabaseSheetName  string `json:"IGRDatabaseSheetName"`
-	NOSSearchSheetName    string `json:"NOSSearchSheetName"`
-	NOSSearch2SheetName   string `json:"NOSSearch2SheetName"`
-	NOSSearch3SheetName   string `json:"NOSSearch3SheetName"`
-	NOSSearch4SheetName   string `json:"NOSSearch4SheetName"`
-	NOSSearch5SheetName   string `json:"NOSSearch5SheetName"`
-	NOSSearch6SheetName   string `json:"NOSSearch6SheetName"`
-	NOSDashboardSheetName string `json:"NOSDashboardSheetName"`
+	SpreadsheetID           string `json:"SpreadsheetID"`
+	SheetNameWithRange      string `json:"SheetNameWithRange"`
+	ResearchJRSheetName     string `json:"ResearchJRSheetName"`
+	FollowingCountSheetName string `json:"FollowingCountSheetName"`
+	SessionIDSheetName      string `json:"SessionIDSheetName"`
+	SessionId               string `json:"SessionId"`
+	IGRDatabaseSheetName    string `json:"IGRDatabaseSheetName"`
+	NOSSearchSheetName      string `json:"NOSSearchSheetName"`
+	NOSSearch2SheetName     string `json:"NOSSearch2SheetName"`
+	NOSSearch3SheetName     string `json:"NOSSearch3SheetName"`
+	NOSSearch4SheetName     string `json:"NOSSearch4SheetName"`
+	NOSSearch5SheetName     string `json:"NOSSearch5SheetName"`
+	NOSSearch6SheetName     string `json:"NOSSearch6SheetName"`
+	NOSDashboardSheetName   string `json:"NOSDashboardSheetName"`
 }
 
 var (
