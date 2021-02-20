@@ -9,5 +9,7 @@
     "NOSDashboardSheetName":"TRACK!A4:K50000",
     "NOSSearch2SheetName":"TRACK-Search-#2",
     "NOSSearch3SheetName":"TRACK-Search-#3",
-    "NOSSearch4SheetName":"TRACK-Search-#4"
+    "NOSSearch4SheetName":"TRACK-Search-#4",
+    "NOSSearch5SheetName":"TRACK-Search-#5",
+    "NOSSearch6SheetName":"TRACK-Search-#6"
 }
