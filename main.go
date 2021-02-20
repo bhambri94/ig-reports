@@ -705,7 +705,7 @@ func handleNOSSearchSetup5(ctx *fasthttp.RequestCtx) {
 			var searchRow []interface{}
 			var dashboardRow []interface{}
 			if (len(reportValues[i])) > 5 {
-				dashboardRow = append(dashboardRow, Time, "#4", userName, reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
+				dashboardRow = append(dashboardRow, Time, "#5", userName, reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
 				nosDashboardFinalValues = append(nosDashboardFinalValues, dashboardRow)
 				searchRow = append(searchRow, Time, reportValues[i][0], userName, reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
 				nosSearchFinalValues = append(nosSearchFinalValues, searchRow)
@@ -870,7 +870,7 @@ func handleNOSSearchSetup6(ctx *fasthttp.RequestCtx) {
 			var searchRow []interface{}
 			var dashboardRow []interface{}
 			if (len(reportValues[i])) > 5 {
-				dashboardRow = append(dashboardRow, Time, "#4", userName, reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
+				dashboardRow = append(dashboardRow, Time, "#6", userName, reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
 				nosDashboardFinalValues = append(nosDashboardFinalValues, dashboardRow)
 				searchRow = append(searchRow, Time, reportValues[i][0], userName, reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
 				nosSearchFinalValues = append(nosSearchFinalValues, searchRow)
