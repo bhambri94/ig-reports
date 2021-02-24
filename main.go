@@ -416,7 +416,7 @@ func handleNOSSearchSetupLatest(ctx *fasthttp.RequestCtx) {
 			var searchRow []interface{}
 			var dashboardRow []interface{}
 			if (len(reportValues[i])) > 5 {
-				dashboardRow = append(dashboardRow, Time, "#2", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], userName, reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
+				dashboardRow = append(dashboardRow, Time, "#2", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
 				nosDashboardFinalValues = append(nosDashboardFinalValues, dashboardRow)
 				searchRow = append(searchRow, Time, reportValues[i][0], userName, reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
 				nosSearchFinalValues = append(nosSearchFinalValues, searchRow)
@@ -581,7 +581,7 @@ func handleNOSSearchSetup4(ctx *fasthttp.RequestCtx) {
 			var searchRow []interface{}
 			var dashboardRow []interface{}
 			if (len(reportValues[i])) > 5 {
-				dashboardRow = append(dashboardRow, Time, "#4", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], userName, reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
+				dashboardRow = append(dashboardRow, Time, "#4", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
 				nosDashboardFinalValues = append(nosDashboardFinalValues, dashboardRow)
 				searchRow = append(searchRow, Time, reportValues[i][0], userName, reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
 				nosSearchFinalValues = append(nosSearchFinalValues, searchRow)
@@ -746,7 +746,7 @@ func handleNOSSearchSetup5(ctx *fasthttp.RequestCtx) {
 			var searchRow []interface{}
 			var dashboardRow []interface{}
 			if (len(reportValues[i])) > 5 {
-				dashboardRow = append(dashboardRow, Time, "#5", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], userName, reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
+				dashboardRow = append(dashboardRow, Time, "#5", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
 				nosDashboardFinalValues = append(nosDashboardFinalValues, dashboardRow)
 				searchRow = append(searchRow, Time, reportValues[i][0], userName, reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
 				nosSearchFinalValues = append(nosSearchFinalValues, searchRow)
@@ -911,7 +911,7 @@ func handleNOSSearchSetup6(ctx *fasthttp.RequestCtx) {
 			var searchRow []interface{}
 			var dashboardRow []interface{}
 			if (len(reportValues[i])) > 5 {
-				dashboardRow = append(dashboardRow, Time, "#6", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], userName, reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
+				dashboardRow = append(dashboardRow, Time, "#6", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
 				nosDashboardFinalValues = append(nosDashboardFinalValues, dashboardRow)
 				searchRow = append(searchRow, Time, reportValues[i][0], userName, reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
 				nosSearchFinalValues = append(nosSearchFinalValues, searchRow)
@@ -1076,7 +1076,7 @@ func handleNOSSearchSetup3(ctx *fasthttp.RequestCtx) {
 			var searchRow []interface{}
 			var dashboardRow []interface{}
 			if (len(reportValues[i])) > 5 {
-				dashboardRow = append(dashboardRow, Time, "#3", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], userName, reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
+				dashboardRow = append(dashboardRow, Time, "#3", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
 				nosDashboardFinalValues = append(nosDashboardFinalValues, dashboardRow)
 				searchRow = append(searchRow, Time, reportValues[i][0], userName, reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
 				nosSearchFinalValues = append(nosSearchFinalValues, searchRow)
@@ -1246,7 +1246,7 @@ func handleNOSSearchSetup1(ctx *fasthttp.RequestCtx) {
 			var searchRow []interface{}
 			var dashboardRow []interface{}
 			if (len(reportValues[i])) > 5 {
-				dashboardRow = append(dashboardRow, Time, "#1", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], userName, reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
+				dashboardRow = append(dashboardRow, Time, "#1", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
 				nosDashboardFinalValues = append(nosDashboardFinalValues, dashboardRow)
 				searchRow = append(searchRow, Time, reportValues[i][0], userName, reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
 				nosSearchFinalValues = append(nosSearchFinalValues, searchRow)
