@@ -1182,7 +1182,7 @@ func handleNOSSearchSetup1(ctx *fasthttp.RequestCtx) {
 		}
 		LastFetchedFollowerCount := SourceSearchQueryFromNOS[sourceIterator][1]
 		if LastFetchedFollowerCount == "" {
-			LastFetchedFollowerCount = "25"
+			LastFetchedFollowerCount = "10"
 			sourceIterator++
 			continue
 		}

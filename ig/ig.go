@@ -722,7 +722,7 @@ func GetNewFollowers(userName string, LastFetchedFollowers string, SessionID str
 	LastFetchedFollowers = strings.Replace(LastFetchedFollowers, ",", "", -1)
 	LastFetchedFollowersInt, err := strconv.Atoi(LastFetchedFollowers)
 	if err != nil {
-		LastFetchedFollowersInt = 25
+		LastFetchedFollowersInt = 10
 	}
 	if SessionID == "" {
 		SessionID = configs.Configurations.SessionId
@@ -780,7 +780,7 @@ func GetNewFollowers(userName string, LastFetchedFollowers string, SessionID str
 			LatestFollowerCount = igFollowersResearch.Data.User.EdgeFollow.Count
 			NumberOfFollowersNeeded = LatestFollowerCount - LastFetchedFollowersInt
 			if NumberOfFollowersNeeded > 50 {
-				NumberOfFollowersNeeded = 25
+				NumberOfFollowersNeeded = 10
 			}
 			fmt.Println(igFollowersResearch)
 			fmt.Println("Latest Follower Counts are: ")
