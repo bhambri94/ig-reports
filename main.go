@@ -40,6 +40,10 @@ func main() {
 	router.GET("/v4/get/nos/search/SessionID=:SessionID", handleNOSSearchSetup4)
 	router.GET("/v5/get/nos/search/SessionID=:SessionID", handleNOSSearchSetup5)
 	router.GET("/v6/get/nos/search/SessionID=:SessionID", handleNOSSearchSetup6)
+	router.GET("/v7/get/nos/search/SessionID=:SessionID", handleNOSSearchSetup7)
+	router.GET("/v8/get/nos/search/SessionID=:SessionID", handleNOSSearchSetup8)
+	router.GET("/v9/get/nos/search/SessionID=:SessionID", handleNOSSearchSetup9)
+	router.GET("/v10/get/nos/search/SessionID=:SessionID", handleNOSSearchSetup10)
 	router.GET("/v1/get/account/database/username=:USERNAME/SessionID=:SessionID", handleIGRDatabaseBackup)
 	router.GET("/v1/get/ig/research/username=:USERNAME/LatestFollowerCount=:LatestFollowerCount/MinFollower=:MinFollower/MaxFollower=:MaxFollower/MinN=:MinN/MinNStar=:MinNStar/NDelta=:NDelta/SessionID=:SessionID", handleSaveIGResearchToSheets)
 	router.GET("/v1/get/ig/nos/username=:USERNAME/LatestFollowerCount=:LatestFollowerCount/MinFollower=:MinFollower/MaxFollower=:MaxFollower/MinN=:MinN/MinNStar=:MinNStar/NDelta=:NDelta/SessionID=:SessionID", handleSaveIGResearchToSheets)
@@ -1618,5 +1622,665 @@ func handleGetAccountDatabase(ctx *fasthttp.RequestCtx) {
 		ctx.Response.SetStatusCode(200)
 		ctx.SetBody([]byte("Something went wrong, please check account is accessible from the mentioned SessionID"))
 		sugar.Infof("calling ig reprts failure!")
+	}
+}
+
+func handleNOSSearchSetup7(ctx *fasthttp.RequestCtx) {
+	configs.SetConfig()
+	sugar.Infof("received a NOS Search request to Google Sheets!")
+	SearchQueryFromNOS := googleSheets.BatchGet(configs.Configurations.NOSSearch7SheetName + "!A2:N2")
+	fmt.Println(SearchQueryFromNOS)
+	var nosSearchFinalValues [][]interface{}
+	var nosDashboardFinalValues [][]interface{}
+	var nosLatestFollowerCountFinalValues [][]interface{}
+	var MinFollower string
+	var MaxFollower string
+	var MinN string
+	var MinNStar string
+	var NDelta string
+
+	if len(SearchQueryFromNOS) == 1 {
+		if len(SearchQueryFromNOS[0]) > 9 {
+			MinFollower = SearchQueryFromNOS[0][8]
+			MaxFollower = SearchQueryFromNOS[0][10]
+			MinFollower = strings.Replace(MinFollower, ",", "", -1)
+			MaxFollower = strings.Replace(MaxFollower, ",", "", -1)
+			if len(SearchQueryFromNOS[0]) > 11 {
+				MinN = SearchQueryFromNOS[0][11]
+				MinN = strings.Replace(MinN, ",", "", -1)
+			}
+			if len(SearchQueryFromNOS[0]) > 12 {
+				MinNStar = SearchQueryFromNOS[0][12]
+				MinNStar = strings.Replace(MinNStar, ",", "", -1)
+			}
+			if len(SearchQueryFromNOS[0]) > 13 {
+				NDelta = SearchQueryFromNOS[0][13]
+				NDelta = strings.Replace(NDelta, ",", "", -1)
+			}
+		}
+	}
+
+	SessionID := ctx.UserValue("SessionID")
+	if SessionID != nil {
+		temp := SessionID.(string)
+		temp = temp[1 : len(temp)-1]
+		SessionID = temp
+	}
+	NoOneSucceededBoolean := false
+	var CookieErrorString1 string
+	SourceSearchQueryFromNOS := googleSheets.BatchGet(configs.Configurations.NOSSearch7SheetName + "!A4:G5000")
+	sourceIterator := 0
+	loc, _ := time.LoadLocation("Europe/Rome")
+	currentTime := time.Now().In(loc)
+	Time := currentTime.Format("2006-01-02")
+	for sourceIterator < len(SourceSearchQueryFromNOS) {
+		if len(SourceSearchQueryFromNOS[sourceIterator]) < 2 {
+			sourceIterator++
+			continue
+		}
+		fmt.Println(MinFollower)
+		fmt.Println(MaxFollower)
+		fmt.Println(MinN)
+		fmt.Println(MinNStar)
+		fmt.Println(NDelta)
+		fmt.Println(SessionID)
+		userName := SourceSearchQueryFromNOS[sourceIterator][0]
+		if userName == "" {
+			sugar.Infof("queryString for search is nil ")
+			ctx.Response.Header.Set("Content-Type", "application/json")
+			ctx.Response.SetStatusCode(200)
+			ctx.SetBody([]byte("Failed! Unable to Find USERNAME shared in URL"))
+			sugar.Infof("calling ig reprts failure due to username!")
+			sourceIterator++
+			continue
+		}
+		LastFetchedFollowerCount := SourceSearchQueryFromNOS[sourceIterator][1]
+		if LastFetchedFollowerCount == "" {
+			LastFetchedFollowerCount = "10"
+		}
+		fmt.Println(userName)
+		fmt.Println(LastFetchedFollowerCount)
+		FollowersList, _, LatestFollowerCount := ig.GetNewFollowers(userName, LastFetchedFollowerCount, SessionID.(string))
+		var nosLatestFollowerCountRows []interface{}
+		if LatestFollowerCount != 0 {
+			nosLatestFollowerCountRows = append(nosLatestFollowerCountRows, userName, LatestFollowerCount)
+		} else {
+			nosLatestFollowerCountRows = append(nosLatestFollowerCountRows, userName)
+		}
+		nosLatestFollowerCountFinalValues = append(nosLatestFollowerCountFinalValues, nosLatestFollowerCountRows)
+		fmt.Println(FollowersList)
+		SearchQuery := make(map[string]int)
+		if MinFollower != "" {
+			temp := MinFollower
+			tempInt, e := strconv.Atoi(temp)
+			if e == nil {
+				SearchQuery["MinFollower"] = tempInt
+			}
+		}
+		if MaxFollower != "" {
+			temp := MaxFollower
+			tempInt, e := strconv.Atoi(temp)
+			if e == nil {
+				SearchQuery["MaxFollower"] = tempInt
+			}
+		}
+		if MinN != "" {
+			temp := MinN
+			tempInt, e := strconv.Atoi(temp)
+			if e == nil {
+				SearchQuery["MinN"] = tempInt
+			}
+		}
+		if MinNStar != "" {
+			temp := MinNStar
+			tempInt, e := strconv.Atoi(temp)
+			if e == nil {
+				SearchQuery["MinNStar"] = tempInt
+			}
+		}
+		NDeltaFloat := 0.0
+		if NDelta != "" {
+			temp := NDelta
+			tempFloat, e := strconv.ParseFloat(temp, 2)
+			if e == nil {
+				NDeltaFloat = tempFloat
+			}
+		}
+		var reportValues [][]interface{}
+		reportValues, NoOneSucceededBoolean, CookieErrorString1 = ig.GetIGReportNew(FollowersList, SearchQuery, SessionID.(string), NDeltaFloat)
+		fmt.Println(reportValues)
+		i := 0
+		for i < len(reportValues) {
+			var searchRow []interface{}
+			var dashboardRow []interface{}
+			if (len(reportValues[i])) > 5 {
+				dashboardRow = append(dashboardRow, Time, "#7", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
+				nosDashboardFinalValues = append(nosDashboardFinalValues, dashboardRow)
+				searchRow = append(searchRow, Time, reportValues[i][0], userName, reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
+				nosSearchFinalValues = append(nosSearchFinalValues, searchRow)
+			}
+			i++
+		}
+		sourceIterator++
+	}
+	fmt.Println("*********")
+	fmt.Println(nosDashboardFinalValues)
+	fmt.Println("#########")
+	fmt.Println(nosSearchFinalValues)
+	if len(nosDashboardFinalValues) > 0 {
+		googleSheets.BatchAppend(configs.Configurations.NOSDashboardSheetName, nosDashboardFinalValues)
+		existingRows := googleSheets.BatchGet(configs.Configurations.NOSSearch7SheetName + "!H4:N5000")
+		StartingRow := len(existingRows) + 3 + 1
+		googleSheets.BatchWrite(configs.Configurations.NOSSearch7SheetName+"!H"+strconv.Itoa(StartingRow)+":N5000", nosSearchFinalValues)
+		googleSheets.BatchWrite(configs.Configurations.NOSSearch7SheetName+"!A4:B5000", nosLatestFollowerCountFinalValues)
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		ctx.Response.SetStatusCode(200)
+		ctx.SetBody([]byte("Success Google Sheet Updated" + " -- " + CookieErrorString1))
+		sugar.Infof("calling ig research reports success!")
+	} else if NoOneSucceededBoolean {
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		ctx.Response.SetStatusCode(200)
+		ctx.SetBody([]byte("Noone passed the filter search query"))
+		sugar.Infof("calling ig research reports success!" + " -- " + CookieErrorString1)
+	} else {
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		ctx.Response.SetStatusCode(200)
+		ctx.SetBody([]byte("Something went wrong, not able to fetch data"))
+		sugar.Infof("calling ig research reports failure!" + " -- " + CookieErrorString1)
+	}
+}
+
+func handleNOSSearchSetup8(ctx *fasthttp.RequestCtx) {
+	configs.SetConfig()
+	sugar.Infof("received a NOS Search request to Google Sheets!")
+	SearchQueryFromNOS := googleSheets.BatchGet(configs.Configurations.NOSSearch8SheetName + "!A2:N2")
+	fmt.Println(SearchQueryFromNOS)
+	var nosSearchFinalValues [][]interface{}
+	var nosDashboardFinalValues [][]interface{}
+	var nosLatestFollowerCountFinalValues [][]interface{}
+	var MinFollower string
+	var MaxFollower string
+	var MinN string
+	var MinNStar string
+	var NDelta string
+
+	if len(SearchQueryFromNOS) == 1 {
+		if len(SearchQueryFromNOS[0]) > 9 {
+			MinFollower = SearchQueryFromNOS[0][8]
+			MaxFollower = SearchQueryFromNOS[0][10]
+			MinFollower = strings.Replace(MinFollower, ",", "", -1)
+			MaxFollower = strings.Replace(MaxFollower, ",", "", -1)
+			if len(SearchQueryFromNOS[0]) > 11 {
+				MinN = SearchQueryFromNOS[0][11]
+				MinN = strings.Replace(MinN, ",", "", -1)
+			}
+			if len(SearchQueryFromNOS[0]) > 12 {
+				MinNStar = SearchQueryFromNOS[0][12]
+				MinNStar = strings.Replace(MinNStar, ",", "", -1)
+			}
+			if len(SearchQueryFromNOS[0]) > 13 {
+				NDelta = SearchQueryFromNOS[0][13]
+				NDelta = strings.Replace(NDelta, ",", "", -1)
+			}
+		}
+	}
+
+	SessionID := ctx.UserValue("SessionID")
+	if SessionID != nil {
+		temp := SessionID.(string)
+		temp = temp[1 : len(temp)-1]
+		SessionID = temp
+	}
+	NoOneSucceededBoolean := false
+	var CookieErrorString1 string
+	SourceSearchQueryFromNOS := googleSheets.BatchGet(configs.Configurations.NOSSearch8SheetName + "!A4:G5000")
+	sourceIterator := 0
+	loc, _ := time.LoadLocation("Europe/Rome")
+	currentTime := time.Now().In(loc)
+	Time := currentTime.Format("2006-01-02")
+	for sourceIterator < len(SourceSearchQueryFromNOS) {
+		if len(SourceSearchQueryFromNOS[sourceIterator]) < 2 {
+			sourceIterator++
+			continue
+		}
+		fmt.Println(MinFollower)
+		fmt.Println(MaxFollower)
+		fmt.Println(MinN)
+		fmt.Println(MinNStar)
+		fmt.Println(NDelta)
+		fmt.Println(SessionID)
+		userName := SourceSearchQueryFromNOS[sourceIterator][0]
+		if userName == "" {
+			sugar.Infof("queryString for search is nil ")
+			ctx.Response.Header.Set("Content-Type", "application/json")
+			ctx.Response.SetStatusCode(200)
+			ctx.SetBody([]byte("Failed! Unable to Find USERNAME shared in URL"))
+			sugar.Infof("calling ig reprts failure due to username!")
+			sourceIterator++
+			continue
+		}
+		LastFetchedFollowerCount := SourceSearchQueryFromNOS[sourceIterator][1]
+		if LastFetchedFollowerCount == "" {
+			LastFetchedFollowerCount = "10"
+		}
+		fmt.Println(userName)
+		fmt.Println(LastFetchedFollowerCount)
+		FollowersList, _, LatestFollowerCount := ig.GetNewFollowers(userName, LastFetchedFollowerCount, SessionID.(string))
+		var nosLatestFollowerCountRows []interface{}
+		if LatestFollowerCount != 0 {
+			nosLatestFollowerCountRows = append(nosLatestFollowerCountRows, userName, LatestFollowerCount)
+		} else {
+			nosLatestFollowerCountRows = append(nosLatestFollowerCountRows, userName)
+		}
+		nosLatestFollowerCountFinalValues = append(nosLatestFollowerCountFinalValues, nosLatestFollowerCountRows)
+		fmt.Println(FollowersList)
+		SearchQuery := make(map[string]int)
+		if MinFollower != "" {
+			temp := MinFollower
+			tempInt, e := strconv.Atoi(temp)
+			if e == nil {
+				SearchQuery["MinFollower"] = tempInt
+			}
+		}
+		if MaxFollower != "" {
+			temp := MaxFollower
+			tempInt, e := strconv.Atoi(temp)
+			if e == nil {
+				SearchQuery["MaxFollower"] = tempInt
+			}
+		}
+		if MinN != "" {
+			temp := MinN
+			tempInt, e := strconv.Atoi(temp)
+			if e == nil {
+				SearchQuery["MinN"] = tempInt
+			}
+		}
+		if MinNStar != "" {
+			temp := MinNStar
+			tempInt, e := strconv.Atoi(temp)
+			if e == nil {
+				SearchQuery["MinNStar"] = tempInt
+			}
+		}
+		NDeltaFloat := 0.0
+		if NDelta != "" {
+			temp := NDelta
+			tempFloat, e := strconv.ParseFloat(temp, 2)
+			if e == nil {
+				NDeltaFloat = tempFloat
+			}
+		}
+		var reportValues [][]interface{}
+		reportValues, NoOneSucceededBoolean, CookieErrorString1 = ig.GetIGReportNew(FollowersList, SearchQuery, SessionID.(string), NDeltaFloat)
+		fmt.Println(reportValues)
+		i := 0
+		for i < len(reportValues) {
+			var searchRow []interface{}
+			var dashboardRow []interface{}
+			if (len(reportValues[i])) > 5 {
+				dashboardRow = append(dashboardRow, Time, "#8", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
+				nosDashboardFinalValues = append(nosDashboardFinalValues, dashboardRow)
+				searchRow = append(searchRow, Time, reportValues[i][0], userName, reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
+				nosSearchFinalValues = append(nosSearchFinalValues, searchRow)
+			}
+			i++
+		}
+		sourceIterator++
+	}
+	fmt.Println("*********")
+	fmt.Println(nosDashboardFinalValues)
+	fmt.Println("#########")
+	fmt.Println(nosSearchFinalValues)
+	if len(nosDashboardFinalValues) > 0 {
+		googleSheets.BatchAppend(configs.Configurations.NOSDashboardSheetName, nosDashboardFinalValues)
+		existingRows := googleSheets.BatchGet(configs.Configurations.NOSSearch8SheetName + "!H4:N5000")
+		StartingRow := len(existingRows) + 3 + 1
+		googleSheets.BatchWrite(configs.Configurations.NOSSearch8SheetName+"!H"+strconv.Itoa(StartingRow)+":N5000", nosSearchFinalValues)
+		googleSheets.BatchWrite(configs.Configurations.NOSSearch8SheetName+"!A4:B5000", nosLatestFollowerCountFinalValues)
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		ctx.Response.SetStatusCode(200)
+		ctx.SetBody([]byte("Success Google Sheet Updated" + " -- " + CookieErrorString1))
+		sugar.Infof("calling ig research reports success!")
+	} else if NoOneSucceededBoolean {
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		ctx.Response.SetStatusCode(200)
+		ctx.SetBody([]byte("Noone passed the filter search query"))
+		sugar.Infof("calling ig research reports success!" + " -- " + CookieErrorString1)
+	} else {
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		ctx.Response.SetStatusCode(200)
+		ctx.SetBody([]byte("Something went wrong, not able to fetch data"))
+		sugar.Infof("calling ig research reports failure!" + " -- " + CookieErrorString1)
+	}
+}
+
+func handleNOSSearchSetup9(ctx *fasthttp.RequestCtx) {
+	configs.SetConfig()
+	sugar.Infof("received a NOS Search request to Google Sheets!")
+	SearchQueryFromNOS := googleSheets.BatchGet(configs.Configurations.NOSSearch9SheetName + "!A2:N2")
+	fmt.Println(SearchQueryFromNOS)
+	var nosSearchFinalValues [][]interface{}
+	var nosDashboardFinalValues [][]interface{}
+	var nosLatestFollowerCountFinalValues [][]interface{}
+	var MinFollower string
+	var MaxFollower string
+	var MinN string
+	var MinNStar string
+	var NDelta string
+
+	if len(SearchQueryFromNOS) == 1 {
+		if len(SearchQueryFromNOS[0]) > 9 {
+			MinFollower = SearchQueryFromNOS[0][8]
+			MaxFollower = SearchQueryFromNOS[0][10]
+			MinFollower = strings.Replace(MinFollower, ",", "", -1)
+			MaxFollower = strings.Replace(MaxFollower, ",", "", -1)
+			if len(SearchQueryFromNOS[0]) > 11 {
+				MinN = SearchQueryFromNOS[0][11]
+				MinN = strings.Replace(MinN, ",", "", -1)
+			}
+			if len(SearchQueryFromNOS[0]) > 12 {
+				MinNStar = SearchQueryFromNOS[0][12]
+				MinNStar = strings.Replace(MinNStar, ",", "", -1)
+			}
+			if len(SearchQueryFromNOS[0]) > 13 {
+				NDelta = SearchQueryFromNOS[0][13]
+				NDelta = strings.Replace(NDelta, ",", "", -1)
+			}
+		}
+	}
+
+	SessionID := ctx.UserValue("SessionID")
+	if SessionID != nil {
+		temp := SessionID.(string)
+		temp = temp[1 : len(temp)-1]
+		SessionID = temp
+	}
+	NoOneSucceededBoolean := false
+	var CookieErrorString1 string
+	SourceSearchQueryFromNOS := googleSheets.BatchGet(configs.Configurations.NOSSearch9SheetName + "!A4:G5000")
+	sourceIterator := 0
+	loc, _ := time.LoadLocation("Europe/Rome")
+	currentTime := time.Now().In(loc)
+	Time := currentTime.Format("2006-01-02")
+	for sourceIterator < len(SourceSearchQueryFromNOS) {
+		if len(SourceSearchQueryFromNOS[sourceIterator]) < 2 {
+			sourceIterator++
+			continue
+		}
+		fmt.Println(MinFollower)
+		fmt.Println(MaxFollower)
+		fmt.Println(MinN)
+		fmt.Println(MinNStar)
+		fmt.Println(NDelta)
+		fmt.Println(SessionID)
+		userName := SourceSearchQueryFromNOS[sourceIterator][0]
+		if userName == "" {
+			sugar.Infof("queryString for search is nil ")
+			ctx.Response.Header.Set("Content-Type", "application/json")
+			ctx.Response.SetStatusCode(200)
+			ctx.SetBody([]byte("Failed! Unable to Find USERNAME shared in URL"))
+			sugar.Infof("calling ig reprts failure due to username!")
+			sourceIterator++
+			continue
+		}
+		LastFetchedFollowerCount := SourceSearchQueryFromNOS[sourceIterator][1]
+		if LastFetchedFollowerCount == "" {
+			LastFetchedFollowerCount = "10"
+		}
+		fmt.Println(userName)
+		fmt.Println(LastFetchedFollowerCount)
+		FollowersList, _, LatestFollowerCount := ig.GetNewFollowers(userName, LastFetchedFollowerCount, SessionID.(string))
+		var nosLatestFollowerCountRows []interface{}
+		if LatestFollowerCount != 0 {
+			nosLatestFollowerCountRows = append(nosLatestFollowerCountRows, userName, LatestFollowerCount)
+		} else {
+			nosLatestFollowerCountRows = append(nosLatestFollowerCountRows, userName)
+		}
+		nosLatestFollowerCountFinalValues = append(nosLatestFollowerCountFinalValues, nosLatestFollowerCountRows)
+		fmt.Println(FollowersList)
+		SearchQuery := make(map[string]int)
+		if MinFollower != "" {
+			temp := MinFollower
+			tempInt, e := strconv.Atoi(temp)
+			if e == nil {
+				SearchQuery["MinFollower"] = tempInt
+			}
+		}
+		if MaxFollower != "" {
+			temp := MaxFollower
+			tempInt, e := strconv.Atoi(temp)
+			if e == nil {
+				SearchQuery["MaxFollower"] = tempInt
+			}
+		}
+		if MinN != "" {
+			temp := MinN
+			tempInt, e := strconv.Atoi(temp)
+			if e == nil {
+				SearchQuery["MinN"] = tempInt
+			}
+		}
+		if MinNStar != "" {
+			temp := MinNStar
+			tempInt, e := strconv.Atoi(temp)
+			if e == nil {
+				SearchQuery["MinNStar"] = tempInt
+			}
+		}
+		NDeltaFloat := 0.0
+		if NDelta != "" {
+			temp := NDelta
+			tempFloat, e := strconv.ParseFloat(temp, 2)
+			if e == nil {
+				NDeltaFloat = tempFloat
+			}
+		}
+		var reportValues [][]interface{}
+		reportValues, NoOneSucceededBoolean, CookieErrorString1 = ig.GetIGReportNew(FollowersList, SearchQuery, SessionID.(string), NDeltaFloat)
+		fmt.Println(reportValues)
+		i := 0
+		for i < len(reportValues) {
+			var searchRow []interface{}
+			var dashboardRow []interface{}
+			if (len(reportValues[i])) > 5 {
+				dashboardRow = append(dashboardRow, Time, "#9", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
+				nosDashboardFinalValues = append(nosDashboardFinalValues, dashboardRow)
+				searchRow = append(searchRow, Time, reportValues[i][0], userName, reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
+				nosSearchFinalValues = append(nosSearchFinalValues, searchRow)
+			}
+			i++
+		}
+		sourceIterator++
+	}
+	fmt.Println("*********")
+	fmt.Println(nosDashboardFinalValues)
+	fmt.Println("#########")
+	fmt.Println(nosSearchFinalValues)
+	if len(nosDashboardFinalValues) > 0 {
+		googleSheets.BatchAppend(configs.Configurations.NOSDashboardSheetName, nosDashboardFinalValues)
+		existingRows := googleSheets.BatchGet(configs.Configurations.NOSSearch9SheetName + "!H4:N5000")
+		StartingRow := len(existingRows) + 3 + 1
+		googleSheets.BatchWrite(configs.Configurations.NOSSearch9SheetName+"!H"+strconv.Itoa(StartingRow)+":N5000", nosSearchFinalValues)
+		googleSheets.BatchWrite(configs.Configurations.NOSSearch9SheetName+"!A4:B5000", nosLatestFollowerCountFinalValues)
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		ctx.Response.SetStatusCode(200)
+		ctx.SetBody([]byte("Success Google Sheet Updated" + " -- " + CookieErrorString1))
+		sugar.Infof("calling ig research reports success!")
+	} else if NoOneSucceededBoolean {
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		ctx.Response.SetStatusCode(200)
+		ctx.SetBody([]byte("Noone passed the filter search query"))
+		sugar.Infof("calling ig research reports success!" + " -- " + CookieErrorString1)
+	} else {
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		ctx.Response.SetStatusCode(200)
+		ctx.SetBody([]byte("Something went wrong, not able to fetch data"))
+		sugar.Infof("calling ig research reports failure!" + " -- " + CookieErrorString1)
+	}
+}
+
+func handleNOSSearchSetup10(ctx *fasthttp.RequestCtx) {
+	configs.SetConfig()
+	sugar.Infof("received a NOS Search request to Google Sheets!")
+	SearchQueryFromNOS := googleSheets.BatchGet(configs.Configurations.NOSSearch10SheetName + "!A2:N2")
+	fmt.Println(SearchQueryFromNOS)
+	var nosSearchFinalValues [][]interface{}
+	var nosDashboardFinalValues [][]interface{}
+	var nosLatestFollowerCountFinalValues [][]interface{}
+	var MinFollower string
+	var MaxFollower string
+	var MinN string
+	var MinNStar string
+	var NDelta string
+
+	if len(SearchQueryFromNOS) == 1 {
+		if len(SearchQueryFromNOS[0]) > 9 {
+			MinFollower = SearchQueryFromNOS[0][8]
+			MaxFollower = SearchQueryFromNOS[0][10]
+			MinFollower = strings.Replace(MinFollower, ",", "", -1)
+			MaxFollower = strings.Replace(MaxFollower, ",", "", -1)
+			if len(SearchQueryFromNOS[0]) > 11 {
+				MinN = SearchQueryFromNOS[0][11]
+				MinN = strings.Replace(MinN, ",", "", -1)
+			}
+			if len(SearchQueryFromNOS[0]) > 12 {
+				MinNStar = SearchQueryFromNOS[0][12]
+				MinNStar = strings.Replace(MinNStar, ",", "", -1)
+			}
+			if len(SearchQueryFromNOS[0]) > 13 {
+				NDelta = SearchQueryFromNOS[0][13]
+				NDelta = strings.Replace(NDelta, ",", "", -1)
+			}
+		}
+	}
+
+	SessionID := ctx.UserValue("SessionID")
+	if SessionID != nil {
+		temp := SessionID.(string)
+		temp = temp[1 : len(temp)-1]
+		SessionID = temp
+	}
+	NoOneSucceededBoolean := false
+	var CookieErrorString1 string
+	SourceSearchQueryFromNOS := googleSheets.BatchGet(configs.Configurations.NOSSearch10SheetName + "!A4:G5000")
+	sourceIterator := 0
+	loc, _ := time.LoadLocation("Europe/Rome")
+	currentTime := time.Now().In(loc)
+	Time := currentTime.Format("2006-01-02")
+	for sourceIterator < len(SourceSearchQueryFromNOS) {
+		if len(SourceSearchQueryFromNOS[sourceIterator]) < 2 {
+			sourceIterator++
+			continue
+		}
+		fmt.Println(MinFollower)
+		fmt.Println(MaxFollower)
+		fmt.Println(MinN)
+		fmt.Println(MinNStar)
+		fmt.Println(NDelta)
+		fmt.Println(SessionID)
+		userName := SourceSearchQueryFromNOS[sourceIterator][0]
+		if userName == "" {
+			sugar.Infof("queryString for search is nil ")
+			ctx.Response.Header.Set("Content-Type", "application/json")
+			ctx.Response.SetStatusCode(200)
+			ctx.SetBody([]byte("Failed! Unable to Find USERNAME shared in URL"))
+			sugar.Infof("calling ig reprts failure due to username!")
+			sourceIterator++
+			continue
+		}
+		LastFetchedFollowerCount := SourceSearchQueryFromNOS[sourceIterator][1]
+		if LastFetchedFollowerCount == "" {
+			LastFetchedFollowerCount = "10"
+		}
+		fmt.Println(userName)
+		fmt.Println(LastFetchedFollowerCount)
+		FollowersList, _, LatestFollowerCount := ig.GetNewFollowers(userName, LastFetchedFollowerCount, SessionID.(string))
+		var nosLatestFollowerCountRows []interface{}
+		if LatestFollowerCount != 0 {
+			nosLatestFollowerCountRows = append(nosLatestFollowerCountRows, userName, LatestFollowerCount)
+		} else {
+			nosLatestFollowerCountRows = append(nosLatestFollowerCountRows, userName)
+		}
+		nosLatestFollowerCountFinalValues = append(nosLatestFollowerCountFinalValues, nosLatestFollowerCountRows)
+		fmt.Println(FollowersList)
+		SearchQuery := make(map[string]int)
+		if MinFollower != "" {
+			temp := MinFollower
+			tempInt, e := strconv.Atoi(temp)
+			if e == nil {
+				SearchQuery["MinFollower"] = tempInt
+			}
+		}
+		if MaxFollower != "" {
+			temp := MaxFollower
+			tempInt, e := strconv.Atoi(temp)
+			if e == nil {
+				SearchQuery["MaxFollower"] = tempInt
+			}
+		}
+		if MinN != "" {
+			temp := MinN
+			tempInt, e := strconv.Atoi(temp)
+			if e == nil {
+				SearchQuery["MinN"] = tempInt
+			}
+		}
+		if MinNStar != "" {
+			temp := MinNStar
+			tempInt, e := strconv.Atoi(temp)
+			if e == nil {
+				SearchQuery["MinNStar"] = tempInt
+			}
+		}
+		NDeltaFloat := 0.0
+		if NDelta != "" {
+			temp := NDelta
+			tempFloat, e := strconv.ParseFloat(temp, 2)
+			if e == nil {
+				NDeltaFloat = tempFloat
+			}
+		}
+		var reportValues [][]interface{}
+		reportValues, NoOneSucceededBoolean, CookieErrorString1 = ig.GetIGReportNew(FollowersList, SearchQuery, SessionID.(string), NDeltaFloat)
+		fmt.Println(reportValues)
+		i := 0
+		for i < len(reportValues) {
+			var searchRow []interface{}
+			var dashboardRow []interface{}
+			if (len(reportValues[i])) > 5 {
+				dashboardRow = append(dashboardRow, Time, "#10", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
+				nosDashboardFinalValues = append(nosDashboardFinalValues, dashboardRow)
+				searchRow = append(searchRow, Time, reportValues[i][0], userName, reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
+				nosSearchFinalValues = append(nosSearchFinalValues, searchRow)
+			}
+			i++
+		}
+		sourceIterator++
+	}
+	fmt.Println("*********")
+	fmt.Println(nosDashboardFinalValues)
+	fmt.Println("#########")
+	fmt.Println(nosSearchFinalValues)
+	if len(nosDashboardFinalValues) > 0 {
+		googleSheets.BatchAppend(configs.Configurations.NOSDashboardSheetName, nosDashboardFinalValues)
+		existingRows := googleSheets.BatchGet(configs.Configurations.NOSSearch10SheetName + "!H4:N5000")
+		StartingRow := len(existingRows) + 3 + 1
+		googleSheets.BatchWrite(configs.Configurations.NOSSearch10SheetName+"!H"+strconv.Itoa(StartingRow)+":N5000", nosSearchFinalValues)
+		googleSheets.BatchWrite(configs.Configurations.NOSSearch10SheetName+"!A4:B5000", nosLatestFollowerCountFinalValues)
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		ctx.Response.SetStatusCode(200)
+		ctx.SetBody([]byte("Success Google Sheet Updated" + " -- " + CookieErrorString1))
+		sugar.Infof("calling ig research reports success!")
+	} else if NoOneSucceededBoolean {
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		ctx.Response.SetStatusCode(200)
+		ctx.SetBody([]byte("Noone passed the filter search query"))
+		sugar.Infof("calling ig research reports success!" + " -- " + CookieErrorString1)
+	} else {
+		ctx.Response.Header.Set("Content-Type", "application/json")
+		ctx.Response.SetStatusCode(200)
+		ctx.SetBody([]byte("Something went wrong, not able to fetch data"))
+		sugar.Infof("calling ig research reports failure!" + " -- " + CookieErrorString1)
 	}
 }

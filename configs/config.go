@@ -21,6 +21,10 @@ type Configs struct {
 	NOSSearch4SheetName     string `json:"NOSSearch4SheetName"`
 	NOSSearch5SheetName     string `json:"NOSSearch5SheetName"`
 	NOSSearch6SheetName     string `json:"NOSSearch6SheetName"`
+	NOSSearch7SheetName     string `json:"NOSSearch7SheetName"`
+	NOSSearch8SheetName     string `json:"NOSSearch8SheetName"`
+	NOSSearch9SheetName     string `json:"NOSSearch9SheetName"`
+	NOSSearch10SheetName    string `json:"NOSSearch10SheetName"`
 	NOSDashboardSheetName   string `json:"NOSDashboardSheetName"`
 }
 
