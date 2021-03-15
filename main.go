@@ -296,6 +296,14 @@ func handleNOSSearchSetupLatest(ctx *fasthttp.RequestCtx) {
 	sugar.Infof("received a NOS Search request to Google Sheets!")
 	SearchQueryFromNOS := googleSheets.BatchGet(configs.Configurations.NOSSearch2SheetName + "!A2:N2")
 	fmt.Println(SearchQueryFromNOS)
+	SearchName := googleSheets.BatchGet(configs.Configurations.NOSSearch2SheetName + "!A1:A1")
+	fmt.Println(SearchName)
+	var FinalSearchName string
+	if len(SearchName) == 1 {
+		if len(SearchName[0]) == 1 {
+			FinalSearchName = SearchName[0][0]
+		}
+	}
 	var nosSearchFinalValues [][]interface{}
 	var nosDashboardFinalValues [][]interface{}
 	var nosLatestFollowerCountFinalValues [][]interface{}
@@ -428,7 +436,7 @@ func handleNOSSearchSetupLatest(ctx *fasthttp.RequestCtx) {
 			var searchRow []interface{}
 			var dashboardRow []interface{}
 			if (len(reportValues[i])) > 5 {
-				dashboardRow = append(dashboardRow, Time, "#2", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
+				dashboardRow = append(dashboardRow, Time, FinalSearchName, SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
 				nosDashboardFinalValues = append(nosDashboardFinalValues, dashboardRow)
 				searchRow = append(searchRow, Time, reportValues[i][0], userName, reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
 				nosSearchFinalValues = append(nosSearchFinalValues, searchRow)
@@ -469,6 +477,14 @@ func handleNOSSearchSetup4(ctx *fasthttp.RequestCtx) {
 	sugar.Infof("received a NOS Search request to Google Sheets!")
 	SearchQueryFromNOS := googleSheets.BatchGet(configs.Configurations.NOSSearch4SheetName + "!A2:N2")
 	fmt.Println(SearchQueryFromNOS)
+	SearchName := googleSheets.BatchGet(configs.Configurations.NOSSearch4SheetName + "!A1:A1")
+	fmt.Println(SearchName)
+	var FinalSearchName string
+	if len(SearchName) == 1 {
+		if len(SearchName[0]) == 1 {
+			FinalSearchName = SearchName[0][0]
+		}
+	}
 	var nosSearchFinalValues [][]interface{}
 	var nosDashboardFinalValues [][]interface{}
 	var nosLatestFollowerCountFinalValues [][]interface{}
@@ -601,7 +617,7 @@ func handleNOSSearchSetup4(ctx *fasthttp.RequestCtx) {
 			var searchRow []interface{}
 			var dashboardRow []interface{}
 			if (len(reportValues[i])) > 5 {
-				dashboardRow = append(dashboardRow, Time, "#4", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
+				dashboardRow = append(dashboardRow, Time, FinalSearchName, SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
 				nosDashboardFinalValues = append(nosDashboardFinalValues, dashboardRow)
 				searchRow = append(searchRow, Time, reportValues[i][0], userName, reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
 				nosSearchFinalValues = append(nosSearchFinalValues, searchRow)
@@ -642,6 +658,14 @@ func handleNOSSearchSetup5(ctx *fasthttp.RequestCtx) {
 	sugar.Infof("received a NOS Search request to Google Sheets!")
 	SearchQueryFromNOS := googleSheets.BatchGet(configs.Configurations.NOSSearch5SheetName + "!A2:N2")
 	fmt.Println(SearchQueryFromNOS)
+	SearchName := googleSheets.BatchGet(configs.Configurations.NOSSearch5SheetName + "!A1:A1")
+	fmt.Println(SearchName)
+	var FinalSearchName string
+	if len(SearchName) == 1 {
+		if len(SearchName[0]) == 1 {
+			FinalSearchName = SearchName[0][0]
+		}
+	}
 	var nosSearchFinalValues [][]interface{}
 	var nosDashboardFinalValues [][]interface{}
 	var nosLatestFollowerCountFinalValues [][]interface{}
@@ -774,7 +798,7 @@ func handleNOSSearchSetup5(ctx *fasthttp.RequestCtx) {
 			var searchRow []interface{}
 			var dashboardRow []interface{}
 			if (len(reportValues[i])) > 5 {
-				dashboardRow = append(dashboardRow, Time, "#5", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
+				dashboardRow = append(dashboardRow, Time, FinalSearchName, SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
 				nosDashboardFinalValues = append(nosDashboardFinalValues, dashboardRow)
 				searchRow = append(searchRow, Time, reportValues[i][0], userName, reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
 				nosSearchFinalValues = append(nosSearchFinalValues, searchRow)
@@ -815,6 +839,14 @@ func handleNOSSearchSetup6(ctx *fasthttp.RequestCtx) {
 	sugar.Infof("received a NOS Search request to Google Sheets!")
 	SearchQueryFromNOS := googleSheets.BatchGet(configs.Configurations.NOSSearch6SheetName + "!A2:N2")
 	fmt.Println(SearchQueryFromNOS)
+	SearchName := googleSheets.BatchGet(configs.Configurations.NOSSearch6SheetName + "!A1:A1")
+	fmt.Println(SearchName)
+	var FinalSearchName string
+	if len(SearchName) == 1 {
+		if len(SearchName[0]) == 1 {
+			FinalSearchName = SearchName[0][0]
+		}
+	}
 	var nosSearchFinalValues [][]interface{}
 	var nosDashboardFinalValues [][]interface{}
 	var nosLatestFollowerCountFinalValues [][]interface{}
@@ -947,7 +979,7 @@ func handleNOSSearchSetup6(ctx *fasthttp.RequestCtx) {
 			var searchRow []interface{}
 			var dashboardRow []interface{}
 			if (len(reportValues[i])) > 5 {
-				dashboardRow = append(dashboardRow, Time, "#6", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
+				dashboardRow = append(dashboardRow, Time, FinalSearchName, SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
 				nosDashboardFinalValues = append(nosDashboardFinalValues, dashboardRow)
 				searchRow = append(searchRow, Time, reportValues[i][0], userName, reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
 				nosSearchFinalValues = append(nosSearchFinalValues, searchRow)
@@ -988,6 +1020,14 @@ func handleNOSSearchSetup3(ctx *fasthttp.RequestCtx) {
 	sugar.Infof("received a NOS Search request to Google Sheets!")
 	SearchQueryFromNOS := googleSheets.BatchGet(configs.Configurations.NOSSearch3SheetName + "!A2:N2")
 	fmt.Println(SearchQueryFromNOS)
+	SearchName := googleSheets.BatchGet(configs.Configurations.NOSSearch3SheetName + "!A1:A1")
+	fmt.Println(SearchName)
+	var FinalSearchName string
+	if len(SearchName) == 1 {
+		if len(SearchName[0]) == 1 {
+			FinalSearchName = SearchName[0][0]
+		}
+	}
 	var nosSearchFinalValues [][]interface{}
 	var nosDashboardFinalValues [][]interface{}
 	var nosLatestFollowerCountFinalValues [][]interface{}
@@ -1120,7 +1160,7 @@ func handleNOSSearchSetup3(ctx *fasthttp.RequestCtx) {
 			var searchRow []interface{}
 			var dashboardRow []interface{}
 			if (len(reportValues[i])) > 5 {
-				dashboardRow = append(dashboardRow, Time, "#3", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
+				dashboardRow = append(dashboardRow, Time, FinalSearchName, SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
 				nosDashboardFinalValues = append(nosDashboardFinalValues, dashboardRow)
 				searchRow = append(searchRow, Time, reportValues[i][0], userName, reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
 				nosSearchFinalValues = append(nosSearchFinalValues, searchRow)
@@ -1161,6 +1201,14 @@ func handleNOSSearchSetup1(ctx *fasthttp.RequestCtx) {
 	sugar.Infof("received a NOS Search 1 request to Google Sheets!")
 	SearchQueryFromNOS := googleSheets.BatchGet(configs.Configurations.NOSSearchSheetName + "!A2:N2")
 	fmt.Println(SearchQueryFromNOS)
+	SearchName := googleSheets.BatchGet(configs.Configurations.NOSSearchSheetName + "!A1:A1")
+	fmt.Println(SearchName)
+	var FinalSearchName string
+	if len(SearchName) == 1 {
+		if len(SearchName[0]) == 1 {
+			FinalSearchName = SearchName[0][0]
+		}
+	}
 	var nosSearchFinalValues [][]interface{}
 	var nosDashboardFinalValues [][]interface{}
 	var nosLatestFollowerCountFinalValues [][]interface{}
@@ -1298,7 +1346,7 @@ func handleNOSSearchSetup1(ctx *fasthttp.RequestCtx) {
 			var searchRow []interface{}
 			var dashboardRow []interface{}
 			if (len(reportValues[i])) > 5 {
-				dashboardRow = append(dashboardRow, Time, "#1", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
+				dashboardRow = append(dashboardRow, Time, FinalSearchName, SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
 				nosDashboardFinalValues = append(nosDashboardFinalValues, dashboardRow)
 				searchRow = append(searchRow, Time, reportValues[i][0], userName, reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
 				nosSearchFinalValues = append(nosSearchFinalValues, searchRow)
@@ -1859,6 +1907,14 @@ func handleNOSSearchSetup8(ctx *fasthttp.RequestCtx) {
 	sugar.Infof("received a NOS Search request to Google Sheets!")
 	SearchQueryFromNOS := googleSheets.BatchGet(configs.Configurations.NOSSearch8SheetName + "!A2:N2")
 	fmt.Println(SearchQueryFromNOS)
+	SearchName := googleSheets.BatchGet(configs.Configurations.NOSSearch8SheetName + "!A1:A1")
+	fmt.Println(SearchName)
+	var FinalSearchName string
+	if len(SearchName) == 1 {
+		if len(SearchName[0]) == 1 {
+			FinalSearchName = SearchName[0][0]
+		}
+	}
 	var nosSearchFinalValues [][]interface{}
 	var nosDashboardFinalValues [][]interface{}
 	var nosLatestFollowerCountFinalValues [][]interface{}
@@ -1991,7 +2047,7 @@ func handleNOSSearchSetup8(ctx *fasthttp.RequestCtx) {
 			var searchRow []interface{}
 			var dashboardRow []interface{}
 			if (len(reportValues[i])) > 5 {
-				dashboardRow = append(dashboardRow, Time, "#8", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
+				dashboardRow = append(dashboardRow, Time, FinalSearchName, SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
 				nosDashboardFinalValues = append(nosDashboardFinalValues, dashboardRow)
 				searchRow = append(searchRow, Time, reportValues[i][0], userName, reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
 				nosSearchFinalValues = append(nosSearchFinalValues, searchRow)
@@ -2032,6 +2088,14 @@ func handleNOSSearchSetup9(ctx *fasthttp.RequestCtx) {
 	sugar.Infof("received a NOS Search request to Google Sheets!")
 	SearchQueryFromNOS := googleSheets.BatchGet(configs.Configurations.NOSSearch9SheetName + "!A2:N2")
 	fmt.Println(SearchQueryFromNOS)
+	SearchName := googleSheets.BatchGet(configs.Configurations.NOSSearch9SheetName + "!A1:A1")
+	fmt.Println(SearchName)
+	var FinalSearchName string
+	if len(SearchName) == 1 {
+		if len(SearchName[0]) == 1 {
+			FinalSearchName = SearchName[0][0]
+		}
+	}
 	var nosSearchFinalValues [][]interface{}
 	var nosDashboardFinalValues [][]interface{}
 	var nosLatestFollowerCountFinalValues [][]interface{}
@@ -2164,7 +2228,7 @@ func handleNOSSearchSetup9(ctx *fasthttp.RequestCtx) {
 			var searchRow []interface{}
 			var dashboardRow []interface{}
 			if (len(reportValues[i])) > 5 {
-				dashboardRow = append(dashboardRow, Time, "#9", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
+				dashboardRow = append(dashboardRow, Time, FinalSearchName, SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
 				nosDashboardFinalValues = append(nosDashboardFinalValues, dashboardRow)
 				searchRow = append(searchRow, Time, reportValues[i][0], userName, reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
 				nosSearchFinalValues = append(nosSearchFinalValues, searchRow)
@@ -2205,6 +2269,14 @@ func handleNOSSearchSetup10(ctx *fasthttp.RequestCtx) {
 	sugar.Infof("received a NOS Search request to Google Sheets!")
 	SearchQueryFromNOS := googleSheets.BatchGet(configs.Configurations.NOSSearch10SheetName + "!A2:N2")
 	fmt.Println(SearchQueryFromNOS)
+	SearchName := googleSheets.BatchGet(configs.Configurations.NOSSearch10SheetName + "!A1:A1")
+	fmt.Println(SearchName)
+	var FinalSearchName string
+	if len(SearchName) == 1 {
+		if len(SearchName[0]) == 1 {
+			FinalSearchName = SearchName[0][0]
+		}
+	}
 	var nosSearchFinalValues [][]interface{}
 	var nosDashboardFinalValues [][]interface{}
 	var nosLatestFollowerCountFinalValues [][]interface{}
@@ -2337,7 +2409,7 @@ func handleNOSSearchSetup10(ctx *fasthttp.RequestCtx) {
 			var searchRow []interface{}
 			var dashboardRow []interface{}
 			if (len(reportValues[i])) > 5 {
-				dashboardRow = append(dashboardRow, Time, "#10", SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
+				dashboardRow = append(dashboardRow, Time, FinalSearchName, SourceSearchQueryFromNOS[sourceIterator][2], SourceSearchQueryFromNOS[sourceIterator][3], SourceSearchQueryFromNOS[sourceIterator][4], SourceSearchQueryFromNOS[sourceIterator][5], SourceSearchQueryFromNOS[sourceIterator][6], reportValues[i][0], reportValues[i][1], reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6], reportValues[i][7], reportValues[i][8])
 				nosDashboardFinalValues = append(nosDashboardFinalValues, dashboardRow)
 				searchRow = append(searchRow, Time, reportValues[i][0], userName, reportValues[i][3], reportValues[i][4], reportValues[i][5], reportValues[i][6])
 				nosSearchFinalValues = append(nosSearchFinalValues, searchRow)
