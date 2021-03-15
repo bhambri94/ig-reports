@@ -13,6 +13,7 @@ type Configs struct {
 	ResearchJRSheetName     string `json:"ResearchJRSheetName"`
 	FollowingCountSheetName string `json:"FollowingCountSheetName"`
 	SessionIDSheetName      string `json:"SessionIDSheetName"`
+	CookieFinderSheet       string `json:"CookieFinderSheet"`
 	SessionId               string `json:"SessionId"`
 	IGRDatabaseSheetName    string `json:"IGRDatabaseSheetName"`
 	NOSSearchSheetName      string `json:"NOSSearchSheetName"`
