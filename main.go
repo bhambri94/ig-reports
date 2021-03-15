@@ -332,10 +332,12 @@ func handleNOSSearchSetupLatest(ctx *fasthttp.RequestCtx) {
 		temp = temp[1 : len(temp)-1]
 		SessionID = temp
 		CookieFinder := googleSheets.BatchGet(configs.Configurations.CookieFinderSheet + "!A4:B4")
-		if len(CookieFinder[0]) == 2 {
-			SessionID = CookieFinder[1]
-			fmt.Print("Received Session ids from Sheet: ")
-			fmt.Println(SessionID.(string))
+		if len(CookieFinder) == 1 {
+			if len(CookieFinder[0]) == 2 {
+				SessionID = CookieFinder[0][1]
+				fmt.Print("Received Session ids from Sheet: ")
+				fmt.Println(SessionID.(string))
+			}
 		}
 	}
 	NoOneSucceededBoolean := false
@@ -503,10 +505,12 @@ func handleNOSSearchSetup4(ctx *fasthttp.RequestCtx) {
 		temp = temp[1 : len(temp)-1]
 		SessionID = temp
 		CookieFinder := googleSheets.BatchGet(configs.Configurations.CookieFinderSheet + "!A6:B6")
-		if len(CookieFinder[0]) == 2 {
-			SessionID = CookieFinder[1]
-			fmt.Print("Received Session ids from Sheet: ")
-			fmt.Println(SessionID.(string))
+		if len(CookieFinder) == 1 {
+			if len(CookieFinder[0]) == 2 {
+				SessionID = CookieFinder[0][1]
+				fmt.Print("Received Session ids from Sheet: ")
+				fmt.Println(SessionID.(string))
+			}
 		}
 	}
 	NoOneSucceededBoolean := false
@@ -674,10 +678,12 @@ func handleNOSSearchSetup5(ctx *fasthttp.RequestCtx) {
 		temp = temp[1 : len(temp)-1]
 		SessionID = temp
 		CookieFinder := googleSheets.BatchGet(configs.Configurations.CookieFinderSheet + "!A7:B7")
-		if len(CookieFinder[0]) == 2 {
-			SessionID = CookieFinder[1]
-			fmt.Print("Received Session ids from Sheet: ")
-			fmt.Println(SessionID.(string))
+		if len(CookieFinder) == 1 {
+			if len(CookieFinder[0]) == 2 {
+				SessionID = CookieFinder[0][1]
+				fmt.Print("Received Session ids from Sheet: ")
+				fmt.Println(SessionID.(string))
+			}
 		}
 	}
 	NoOneSucceededBoolean := false
@@ -845,10 +851,12 @@ func handleNOSSearchSetup6(ctx *fasthttp.RequestCtx) {
 		temp = temp[1 : len(temp)-1]
 		SessionID = temp
 		CookieFinder := googleSheets.BatchGet(configs.Configurations.CookieFinderSheet + "!A8:B8")
-		if len(CookieFinder[0]) == 2 {
-			SessionID = CookieFinder[1]
-			fmt.Print("Received Session ids from Sheet: ")
-			fmt.Println(SessionID.(string))
+		if len(CookieFinder) == 1 {
+			if len(CookieFinder[0]) == 2 {
+				SessionID = CookieFinder[0][1]
+				fmt.Print("Received Session ids from Sheet: ")
+				fmt.Println(SessionID.(string))
+			}
 		}
 	}
 	NoOneSucceededBoolean := false
@@ -1016,10 +1024,12 @@ func handleNOSSearchSetup3(ctx *fasthttp.RequestCtx) {
 		temp = temp[1 : len(temp)-1]
 		SessionID = temp
 		CookieFinder := googleSheets.BatchGet(configs.Configurations.CookieFinderSheet + "!A5:B5")
-		if len(CookieFinder[0]) == 2 {
-			SessionID = CookieFinder[1]
-			fmt.Print("Received Session ids from Sheet: ")
-			fmt.Println(SessionID.(string))
+		if len(CookieFinder) == 1 {
+			if len(CookieFinder[0]) == 2 {
+				SessionID = CookieFinder[0][1]
+				fmt.Print("Received Session ids from Sheet: ")
+				fmt.Println(SessionID.(string))
+			}
 		}
 	}
 	NoOneSucceededBoolean := false
@@ -1187,10 +1197,12 @@ func handleNOSSearchSetup1(ctx *fasthttp.RequestCtx) {
 		temp = temp[1 : len(temp)-1]
 		SessionID = temp
 		CookieFinder := googleSheets.BatchGet(configs.Configurations.CookieFinderSheet + "!A3:B3")
-		if len(CookieFinder[0]) == 2 {
-			SessionID = CookieFinder[1]
-			fmt.Print("Received Session ids from Sheet: ")
-			fmt.Println(SessionID.(string))
+		if len(CookieFinder) == 1 {
+			if len(CookieFinder[0]) == 2 {
+				SessionID = CookieFinder[0][1]
+				fmt.Print("Received Session ids from Sheet: ")
+				fmt.Println(SessionID.(string))
+			}
 		}
 	}
 	// NoOneSucceededBoolean := false
@@ -1702,10 +1714,12 @@ func handleNOSSearchSetup7(ctx *fasthttp.RequestCtx) {
 		temp = temp[1 : len(temp)-1]
 		SessionID = temp
 		CookieFinder := googleSheets.BatchGet(configs.Configurations.CookieFinderSheet + "!A9:B9")
-		if len(CookieFinder[0]) == 2 {
-			SessionID = CookieFinder[1]
-			fmt.Print("Received Session ids from Sheet: ")
-			fmt.Println(SessionID.(string))
+		if len(CookieFinder) == 1 {
+			if len(CookieFinder[0]) == 2 {
+				SessionID = CookieFinder[0][1]
+				fmt.Print("Received Session ids from Sheet: ")
+				fmt.Println(SessionID.(string))
+			}
 		}
 	}
 	NoOneSucceededBoolean := false
@@ -1873,10 +1887,12 @@ func handleNOSSearchSetup8(ctx *fasthttp.RequestCtx) {
 		temp = temp[1 : len(temp)-1]
 		SessionID = temp
 		CookieFinder := googleSheets.BatchGet(configs.Configurations.CookieFinderSheet + "!A10:B10")
-		if len(CookieFinder[0]) == 2 {
-			SessionID = CookieFinder[1]
-			fmt.Print("Received Session ids from Sheet: ")
-			fmt.Println(SessionID.(string))
+		if len(CookieFinder) == 1 {
+			if len(CookieFinder[0]) == 2 {
+				SessionID = CookieFinder[0][1]
+				fmt.Print("Received Session ids from Sheet: ")
+				fmt.Println(SessionID.(string))
+			}
 		}
 	}
 	NoOneSucceededBoolean := false
@@ -2044,10 +2060,12 @@ func handleNOSSearchSetup9(ctx *fasthttp.RequestCtx) {
 		temp = temp[1 : len(temp)-1]
 		SessionID = temp
 		CookieFinder := googleSheets.BatchGet(configs.Configurations.CookieFinderSheet + "!A11:B11")
-		if len(CookieFinder[0]) == 2 {
-			SessionID = CookieFinder[1]
-			fmt.Print("Received Session ids from Sheet: ")
-			fmt.Println(SessionID.(string))
+		if len(CookieFinder) == 1 {
+			if len(CookieFinder[0]) == 2 {
+				SessionID = CookieFinder[0][1]
+				fmt.Print("Received Session ids from Sheet: ")
+				fmt.Println(SessionID.(string))
+			}
 		}
 	}
 	NoOneSucceededBoolean := false
@@ -2215,10 +2233,12 @@ func handleNOSSearchSetup10(ctx *fasthttp.RequestCtx) {
 		temp = temp[1 : len(temp)-1]
 		SessionID = temp
 		CookieFinder := googleSheets.BatchGet(configs.Configurations.CookieFinderSheet + "!A12:B12")
-		if len(CookieFinder[0]) == 2 {
-			SessionID = CookieFinder[1]
-			fmt.Print("Received Session ids from Sheet: ")
-			fmt.Println(SessionID.(string))
+		if len(CookieFinder) == 1 {
+			if len(CookieFinder[0]) == 2 {
+				SessionID = CookieFinder[0][1]
+				fmt.Print("Received Session ids from Sheet: ")
+				fmt.Println(SessionID.(string))
+			}
 		}
 	}
 	NoOneSucceededBoolean := false
